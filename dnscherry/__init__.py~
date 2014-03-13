@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import dns.query
+import dns.zone
+from dns.exception import DNSException
+from dns.rdataclass import *
+from dns.rdatatype import *
+
+import cherrypy
+from mako.template import Template
+
+resource_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/static/'
+template_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/templates/'
+zone_name = 'example.com'
+ip = '127.0.0.1'
+record_list = [ 'A', 'AAAA', 'CNAME']
+
+class DnsCherry(object):
+
+    def __init__(self):
+        self.resource_dir = resource_dir
+        self.template_dir = template_dir
+        self.zone_name = zone_name
+        self.ip = ip
+        self.zone = ''
+        self._refresh_zone()
+        self.temp_index = Template(filename = self.template_dir + '/index.tmpl', input_encoding='utf-8')
+
+    def _refresh_zone(self):
+        self.zone = dns.zone.from_xfr(dns.query.xfr(self.ip, self.zone_name))
+        
+
+    @cherrypy.expose
+    def index(self):
+        self._refresh_zone()
+        return self.temp_index.render()
+
+z = dns.zone.from_xfr(dns.query.xfr('127.0.0.1', 'example.com'))
+names = z.nodes.keys()
+names.sort()
+records = []
+for name, node in z.nodes.items():
+    rdatasets = node.rdatasets
+    for rdataset in rdatasets:
+        for rdata in rdataset:
+            record = {}
+            record['key'] = name
+            record['class'] = rdataset.rdclass
+            record['type'] = rdataset.rdtype
+            record['ttl'] = rdataset.ttl
+            if rdataset.rdtype == SOA:
+                record['content'] = ' '.join([rdata.expire,
+                    rdata.minimum,
+                    rdata.mname,
+                    rdata.refresh,
+                    rdata.retry,
+                    rdata.rname,
+                    str(rdata.serial)
+                    ]
+                    )
+            elif rdataset.rdtype == MX:
+                record['content'] = ' '.join([rdata.exchange,
+                    rdata.preference
+                    ]
+                    )
+            elif rdataset.rdtype == NS:
+                record['content'] = rdata.target
+            elif rdataset.rdtype == CNAME:
+                record['content'] = rdata.target
+            elif rdataset.rdtype == A:
+                record['content'] = rdata.address
+            elif rdataset.rdtype == AAAA:
+                record['content'] = rdata.address
+            print record
+
+print names
+for n in names:
+        print type(z[n])
+        print z[n].to_text(n)
+
+#static_handler = cherrypy.tools.staticdir.handler(section="/", dir=resource_dir)
+#cherrypy.tree.mount(static_handler, '/static/')
+#cherrypy.quickstart(DnsCherry())
+
+
+
+
