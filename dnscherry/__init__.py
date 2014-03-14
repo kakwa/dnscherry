@@ -3,10 +3,13 @@
 
 import dns.query
 import dns.zone
+import dns.tsigkeyring
+import dns.update
 from operator import itemgetter
 from dns.exception import DNSException
 from dns.rdataclass import *
 from dns.rdatatype import *
+import sys
 
 import cherrypy
 from cherrypy.lib.httputil import parse_query_string
@@ -104,16 +107,30 @@ class DnsCherry(object):
                 type_written = self.type_written,
                 current_zone = zone
                 )
+    def _manage_record(self, key=None, ttl=None, type=None,
+            zone=None, content=None, action=None):
+        
+        keyring = dns.tsigkeyring.from_text({
+            zone : self.zone_list[zone]['key']
+        })
+
+        update = dns.update.Update('dyn.test.example', keyring=keyring)
+        if action == 'add':
+            update.add(key, ttl, type, content)
+        elif action == 'del':
+            update.delete(key, ttl, type, content)
+        else:
+            raise NameError('UnhandleDnsUpdateMethod')
+
+        response = dns.query.tcp(update, '10.0.0.1')
 
     @cherrypy.expose
-    def add_record(self, key=None, TTL=None, type=None, 
+    def add_record(self, key=None, ttl=None, type=None, 
             zone=None, content=None):
-        parse_query_string(cherrypy.request.query_string)
-        # zone is defined by the query string parameter
-        # if query string is empty, use the default zone
-        if zone is None:
-            zone = self.zone_default
-        return "New: " + ' '.join([key, TTL, type, content, zone])
+
+        self._manage_record(key, ttl, type, zone, content, 'add')
+
+        return "New: " + ' '.join([key, ttl, type, content, zone])
 
 cherrypy.quickstart(DnsCherry())
 
