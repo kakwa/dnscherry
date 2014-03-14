@@ -95,6 +95,8 @@ class DnsCherry(object):
         except dns.exception.FormError:
             raise cherrypy.HTTPError(500, 'unable to get Zone [' + zone +  ']\
                     from DNS [' + self.zone_list[zone]['ip'] + ']')
+        except KeyError:
+            raise cherrypy.HTTPError(400, 'Bad Zone [' + zone +  ']')
         return self.temp_index.render(
                 records=records, 
                 zone_list=self.zone_list,
@@ -102,6 +104,16 @@ class DnsCherry(object):
                 type_written = self.type_written,
                 current_zone = zone
                 )
+
+    @cherrypy.expose
+    def add_record(self, key=None, TTL=None, type=None, 
+            zone=None, content=None):
+        parse_query_string(cherrypy.request.query_string)
+        # zone is defined by the query string parameter
+        # if query string is empty, use the default zone
+        if zone is None:
+            zone = self.zone_default
+        return "New: " + ' '.join([key, TTL, type, content, zone])
 
 cherrypy.quickstart(DnsCherry())
 

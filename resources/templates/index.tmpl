@@ -57,25 +57,25 @@
 					<a class="navbar-brand navbar-right" href="https://github.com/kakwa/dnscherry">DnsCherry</a>
 				</div>
 			</nav>
-			<form role="form" class="form-inline">
+			<form method='POST' action='add_record/' role="form" class="form-inline">
+                <input type="hidden" name="zone" value="${current_zone}" />
 				<div class="form-group">
-					 <label for="key">Record key</label><input type="text" class="form-control" id="key">
+					 <label for="key">Record key</label><input type="text" class="form-control" name="key">
 				</div>
 				<div class="form-group">
-					 <label for="TTL">TTL</label><input type="text" class="form-control" id="TTL" value="${default_ttl}">
+					 <label for="TTL">TTL</label><input type="text" class="form-control" name="TTL" value="${default_ttl}">
 				</div>
 				<div class="form-group">
                     <label for="type">Type</label>
-                    <select class="form-control">
+                    <select class="form-control" name="type">
                           %for type in type_written:
                           <option>${type}</option>
                           %endfor
                     </select>
 				</div>
 				<div class="form-group">
-					 <label for="type">Content</label><input type="text" class="form-control" id="content">
+					 <label for="type">Content</label><input type="text" class="form-control" name="content">
 				</div>
-
 				<button type="submit" class="btn btn-default">Submit</button>
 			</form>
 			<table class="table table-hover table-condensed">
