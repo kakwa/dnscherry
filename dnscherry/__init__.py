@@ -4,6 +4,7 @@
 import dns.query
 import dns.zone
 import dns.tsigkeyring
+from dns.tsig import PeerBadKey
 import dns.update
 from operator import itemgetter
 from dns.exception import DNSException
@@ -17,12 +18,11 @@ from mako.template import Template
 
 resource_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/static/'
 template_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/templates/'
-zone_list = {'example.com': {'ip': '127.0.0.1', 'key': '0000'},
-        'example2.com':{'ip': '127.0.0.1', 'key': '00001'},
+zone_list = {'example.com': {'ip': '127.0.0.1', 'key': 'ujeGPu0NCU1TO9fQKiiuXg==', 'algorithm': 'hmac-md5'},
         }
 zone_default2 = 'example.com'
 type_displayed = [ 'A', 'AAAA', 'CNAME']
-type_written = [ 'A', 'AAAA', 'CNAME', 'MX']
+type_written = [ 'A', 'AAAA', 'CNAME', 'MX', 'CACA']
 default_ttl = '3600'
 
 class DnsCherry(object):
@@ -107,6 +107,8 @@ class DnsCherry(object):
                 type_written = self.type_written,
                 current_zone = zone
                 )
+
+
     def _manage_record(self, key=None, ttl=None, type=None,
             zone=None, content=None, action=None):
         
@@ -114,26 +116,62 @@ class DnsCherry(object):
             zone : self.zone_list[zone]['key']
         })
 
-        update = dns.update.Update('dyn.test.example', keyring=keyring)
-        if action == 'add':
-            update.add(key, ttl, type, content)
-        elif action == 'del':
-            update.delete(key, ttl, type, content)
-        else:
-            raise NameError('UnhandleDnsUpdateMethod')
+        update = dns.update.Update(zone + '.' , keyring=keyring)
 
-        response = dns.query.tcp(update, '10.0.0.1')
+        try:
+            if action == 'add':
+                ttl = int(ttl)
+                content = str(content)
+                type = str(type)
+                update.add(key, ttl, type, content)
+            elif action == 'del':
+                type = str(type)
+                update.delete(key, type)
+            else:
+                raise NameError('UnhandleDnsUpdateMethod')
+        except dns.exception.SyntaxError:
+            raise cherrypy.HTTPError(400, 'Wrong form data, bad format')
+        except UnknownRdatatype:
+            raise cherrypy.HTTPError(500, 'Unknown record type')
+        try:
+            response = dns.query.tcp(update, self.zone_list[zone]['ip'])
+        except PeerBadKey as e:
+            raise cherrypy.HTTPError(500, ' Bad auth for zone [' + zone +  ']\
+                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+
+    @cherrypy.expose
+    def del_record(self, record=None, zone=None):
+
+        # if we select only on entry, it's a string and not a list
+        if not isinstance(record, list):
+            record = [record]
+
+        for r in record:
+            print r
+            key = (r.split(';'))[0]
+            type = (r.split(';'))[1]
+            try:
+                self._manage_record(key=key, type=type, zone=zone, action='del')
+            except 'PeerBadKey':
+                raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
+                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+
+
+        return "New: " + ' '.join(record)
+
+
 
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
             zone=None, content=None):
 
-        self._manage_record(key, ttl, type, zone, content, 'add')
+        try:
+            self._manage_record(key, ttl, type, zone, content, 'add')
+        except 'PeerBadKey':
+            raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
+                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+
 
         return "New: " + ' '.join([key, ttl, type, content, zone])
 
 cherrypy.quickstart(DnsCherry())
-
-
-
-

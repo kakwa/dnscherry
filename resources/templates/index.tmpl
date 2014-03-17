@@ -13,6 +13,7 @@
 	<!--append ‘#!watch’ to the browser URL, then refresh the page. -->
 	
 	<link href="static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="static/css/custom.css" rel="stylesheet">
 	<link href="static/css/style.css" rel="stylesheet">
 
   <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -57,6 +58,10 @@
 					<a class="navbar-brand navbar-right" href="https://github.com/kakwa/dnscherry">DnsCherry</a>
 				</div>
 			</nav>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
 			<form method='POST' action='add_record/' role="form" class="form-inline">
                 <input type="hidden" name="zone" value="${current_zone}" />
 				<div class="form-group">
@@ -74,53 +79,91 @@
                     </select>
 				</div>
 				<div class="form-group">
-					 <label for="type">Content</label><input type="text" class="form-control" name="content">
+					 <label for="type">Content</label>
+                     <input type="text" class="form-control" name="content">
 				</div>
-				<button type="submit" class="btn btn-default">Submit</button>
+				<div class="form-group">
+			        <label for="submit">Submit</label>
+				    <button type="submit" class="form-control btn btn-default green"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+				</div>
 			</form>
-			<table class="table table-hover table-condensed">
-				<thead>
-					<tr>
-						<th>
-							Record Key
-						</th>
-						<th>
-							TTL
-						</th>
-						<th>
-							Class
-						</th>
-						<th>
-							Type
-						</th>
-						<th>
-							Content
-						</th>
-
-					</tr>
-				</thead>
-				<tbody>
-                    %for record in records:
-					<tr>
-						<td>
-							${record['key']}
-						</td>
-						<td>
-							${record['ttl']}
-						</td>
-						<td>
-							${record['class']}
-						</td>
-						<td>
-							${record['type']}
-						</td>
-						<td>
-							${record['content']}
-						</td>
-					</tr>
-                    % endfor
-				</tbody>
-			</table>
+		</div>
+	</div>
+	<div class="row clearfix top-buffer">
+		<div class="col-md-12 column">
+            <div class="well well-sm">
+				<form method='POST' action='del_record/' role="form" class="form-inline">
+                    <input type="hidden" name="zone" value="${current_zone}" />
+					<table class="table table-hover table-condensed">
+						<thead>
+							<tr>
+								<th>
+									Record Key
+								</th>
+								<th>
+									TTL
+								</th>
+								<th>
+									Class
+								</th>
+								<th>
+									Type
+								</th>
+								<th>
+									Content
+								</th>
+								<th>
+					                Delete? 
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+                            %for record in records:
+							<tr>
+								<td>
+									${record['key']}
+								</td>
+								<td>
+									${record['ttl']}
+								</td>
+								<td>
+									${record['class']}
+								</td>
+								<td>
+									${record['type']}
+								</td>
+								<td>
+									${record['content']}
+								</td>
+								<td>
+									<input type="checkbox" name="record" value="${record['key']};${record['type']}">
+								</td>
+							</tr>
+                            % endfor
+						</tbody>
+							<tr>
+								<th>
+									Record Key
+								</th>
+								<th>
+									TTL
+								</th>
+								<th>
+									Class
+								</th>
+								<th>
+									Type
+								</th>
+								<th>
+									Content
+								</th>
+								<th>
+					                <button type="submit" class="btn btn-default red"><span class="glyphicon glyphicon-remove-sign"></span> Delete</button>
+								</th>
+							</tr>
+					</table>
+				</form>
+		    </div>
 		</div>
 	</div>
 </div>
