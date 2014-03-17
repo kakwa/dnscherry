@@ -147,7 +147,6 @@ class DnsCherry(object):
             record = [record]
 
         for r in record:
-            print r
             key = (r.split(';'))[0]
             type = (r.split(';'))[1]
             try:
