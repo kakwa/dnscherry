@@ -18,51 +18,49 @@
             <h4>Removed record(s):</h4>
             %endif
             <div class="well well-sm">
-                <form method='POST' action='del_record/' role="form" class="form-inline">
-                    <input type="hidden" name="zone" value="${current_zone}" />
-                    <table class="table table-hover table-condensed">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Record Key
-                                </th>
-                                <th>
-                                    TTL
-                                </th>
-                                <th>
-                                    Class
-                                </th>
-                                <th>
-                                    Type
-                                </th>
-                                <th>
-                                    Content
-                                </th>
-                            </tr>
-                        </thead>
-						<tbody>
-                            %for record in records:
-							<tr>
-								<td>
-									${record['key']}
-								</td>
-								<td>
-									${record['ttl']}
-								</td>
-								<td>
-									${record['class']}
-								</td>
-								<td>
-									${record['type']}
-								</td>
-								<td>
-									${record['content']}
-								</td>
-							</tr>
-                            % endfor
-						</tbody>
-                    </table>
-                </form>
+                <input type="hidden" name="zone" value="${current_zone}" />
+                <table class="table table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th>
+                                Record Key
+                            </th>
+                            <th>
+                                TTL
+                            </th>
+                            <th>
+                                Class
+                            </th>
+                            <th>
+                                Type
+                            </th>
+                            <th>
+                                Content
+                            </th>
+                        </tr>
+                    </thead>
+					<tbody>
+                        %for record in records:
+						<tr>
+							<td>
+								${record['key']}
+							</td>
+							<td>
+								${record['ttl']}
+							</td>
+							<td>
+								${record['class']}
+							</td>
+							<td>
+								${record['type']}
+							</td>
+							<td>
+								${record['content']}
+							</td>
+						</tr>
+                        % endfor
+					</tbody>
+                </table>
                 <a class="btn btn-primary btn-default" href='/?zone=${current_zone}'><span class="glyphicon glyphicon-home"> Return</a>
             </div>
         </div>
