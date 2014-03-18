@@ -176,17 +176,17 @@ class DnsCherry(object):
             raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
                     on DNS [' + self.zone_list[zone]['ip'] + ']')
 
-        new_record = {
+        new_record = [{
                 'key': key,
                 'ttl': ttl,
                 'class': 'IN',
                 'type': type,
                 'content': content
-                }
+                }]
 
 
         return self.temp_result.render(
-                record = new_record,
+                records = new_record,
                 zone_list = self.zone_list,
                 current_zone = zone,
                 message = self.sucess_message_add,

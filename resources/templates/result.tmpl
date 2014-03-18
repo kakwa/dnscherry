@@ -35,25 +35,27 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    ${record['key']}
-                                </td>
-                                <td>
-                                    ${record['ttl']}
-                                </td>
-                                <td>
-                                    ${record['class']}
-                                </td>
-                                <td>
-                                    ${record['type']}
-                                </td>
-                                <td>
-                                    ${record['content']}
-                                </td>
-                            </tr>
-                        </tbody>
+						<tbody>
+                            %for record in records:
+							<tr>
+								<td>
+									${record['key']}
+								</td>
+								<td>
+									${record['ttl']}
+								</td>
+								<td>
+									${record['class']}
+								</td>
+								<td>
+									${record['type']}
+								</td>
+								<td>
+									${record['content']}
+								</td>
+							</tr>
+                            % endfor
+						</tbody>
                     </table>
                 </form>
                 <a class="btn btn-primary btn-default" href='/?zone=${current_zone}'><span class="glyphicon glyphicon-home"> Return</a>
