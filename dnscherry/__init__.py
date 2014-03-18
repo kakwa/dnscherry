@@ -48,8 +48,9 @@ class DnsCherry(object):
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
         self.temp_result = self.temp_lookup.get_template('result.tmpl')
 
-        #some static message
-        self.sucess_message_add = """New record successfully added!"""
+        #some static messages
+        self.sucess_message_add = """New record(s) successfully added!"""
+        self.sucess_message_del = """New record(s) successfully deleted!"""
 
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
@@ -151,9 +152,22 @@ class DnsCherry(object):
         if not isinstance(record, list):
             record = [record]
 
+        deleted_records = []
+
         for r in record:
             key = (r.split(';'))[0]
             type = (r.split(';'))[1]
+            content = (r.split(';'))[2]
+            dns_class = (r.split(';'))[3]
+            ttl = (r.split(';'))[4]
+            del_record = {
+                   'key': key,
+                   'ttl': ttl,
+                   'class': dns_class,
+                   'type': type,
+                   'content': content
+                   }
+            deleted_records.append(del_record)
             try:
                 self._manage_record(key=key, type=type, zone=zone, action='del')
             except 'PeerBadKey':
@@ -161,9 +175,14 @@ class DnsCherry(object):
                     on DNS [' + self.zone_list[zone]['ip'] + ']')
 
 
-        return "New: " + ' '.join(record)
-
-
+        return self.temp_result.render(
+                records = deleted_records,
+                zone_list = self.zone_list,
+                current_zone = zone,
+                message = self.sucess_message_del,
+                alert = 'success',
+                action = 'del'
+                )
 
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
