@@ -2,7 +2,7 @@
 <%block name="core">
     <div class="row clearfix">
         <div class="col-md-12 column">
-            <form method='POST' action='add_record/' role="form" class="form-inline">
+            <form method='POST' action='/add_record/' role="form" class="form-inline">
                 <input type="hidden" name="zone" value="${current_zone}" />
                 <div class="form-group">
                      <label for="key">Record key</label><input type="text" class="form-control" name="key">
@@ -32,7 +32,7 @@
 	<div class="row clearfix top-buffer">
 		<div class="col-md-12 column">
             <div class="well well-sm">
-				<form method='POST' action='del_record/' role="form" class="form-inline">
+				<form method='POST' action='/del_record/' role="form" class="form-inline">
                     <input type="hidden" name="zone" value="${current_zone}" />
 					<table class="table table-hover table-condensed">
 						<thead>
