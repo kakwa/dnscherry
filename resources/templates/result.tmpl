@@ -1,0 +1,64 @@
+<%inherit file="navbar.tmpl"/>
+<%block name="core">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="alert alert-dismissable alert-success">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4>
+                    Alert!
+                </h4> <strong>Warning!</strong> Best check yo self, you're not looking too good. <a href="#" class="alert-link">alert link</a>
+            </div>
+        </div>
+    </div>
+    <div class="row clearfix top-buffer">
+        <div class="col-md-12 column">
+            <div class="well well-sm">
+                <form method='POST' action='del_record/' role="form" class="form-inline">
+                    <input type="hidden" name="zone" value="${current_zone}" />
+                    <table class="table table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Record Key
+                                </th>
+                                <th>
+                                    TTL
+                                </th>
+                                <th>
+                                    Class
+                                </th>
+                                <th>
+                                    Type
+                                </th>
+                                <th>
+                                    Content
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    ${record['key']}
+                                </td>
+                                <td>
+                                    ${record['ttl']}
+                                </td>
+                                <td>
+                                    ${record['class']}
+                                </td>
+                                <td>
+                                    ${record['type']}
+                                </td>
+                                <td>
+                                    ${record['content']}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                <a class="btn btn-primary btn-default" href='/?zone=${current_zone}'><span class="glyphicon glyphicon-home"> Return</a>
+            </div>
+        </div>
+    </div>
+</%block>
+

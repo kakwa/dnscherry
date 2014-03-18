@@ -46,6 +46,7 @@ class DnsCherry(object):
         # preload templates
         self.temp_lookup = lookup.TemplateLookup(directories=self.template_dir, input_encoding='utf-8')
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
+        self.temp_result = self.temp_lookup.get_template('result.tmpl')
 
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
@@ -172,7 +173,18 @@ class DnsCherry(object):
             raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
                     on DNS [' + self.zone_list[zone]['ip'] + ']')
 
+        new_record = {
+                'key': key,
+                'ttl': ttl,
+                'class': 'IN',
+                'type': type,
+                'content': content
+                }
 
-        return "New: " + ' '.join([key, ttl, type, content, zone])
+        return self.temp_result.render(
+                record = new_record,
+                zone_list = self.zone_list,
+                current_zone = zone
+                )
 
 cherrypy.quickstart(DnsCherry())
