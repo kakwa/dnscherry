@@ -15,6 +15,7 @@ import sys
 import cherrypy
 from cherrypy.lib.httputil import parse_query_string
 from mako.template import Template
+from mako import lookup
 
 resource_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/static/'
 template_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/templates/'
@@ -42,9 +43,10 @@ class DnsCherry(object):
         self.type_displayed = type_displayed
         # configure the list of dns entry type a user can write
         self.type_written = type_written
-        # preload the base template
-        self.temp_index = Template(filename = 
-                self.template_dir + '/index.tmpl', input_encoding='utf-8')
+        # preload templates
+        self.temp_lookup = lookup.TemplateLookup(directories=self.template_dir, input_encoding='utf-8')
+        self.temp_index = self.temp_lookup.get_template('index.tmpl')
+
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
                 dir=resource_dir)

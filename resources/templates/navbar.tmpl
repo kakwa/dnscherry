@@ -1,0 +1,28 @@
+#<%inherit file="base.tmpl"/>
+<%block name="navbar">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<nav class="navbar navbar-default" role="navigation">
+				<div class="navbar-header">
+					 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="?zone=${current_zone}">zone: ${current_zone}</a>
+				</div>
+				
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="dropdown">
+							 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select Zone<strong class="caret"></strong></a>
+							<ul class="dropdown-menu">
+                                %for zone in zone_list:
+								<li>
+									<a href="?zone=${zone}">${zone}</a>
+								</li>
+                                % endfor
+							</ul>
+						</li>
+					</ul>
+					<a class="navbar-brand navbar-right" href="https://github.com/kakwa/dnscherry" target="_blank">DnsCherry</a>
+				</div>
+			</nav>
+		</div>
+	</div>
+</%block>
