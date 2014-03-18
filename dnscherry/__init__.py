@@ -48,6 +48,9 @@ class DnsCherry(object):
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
         self.temp_result = self.temp_lookup.get_template('result.tmpl')
 
+        #some static message
+        self.sucess_message_add = """New record successfully added!"""
+
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
                 dir=resource_dir)
@@ -181,10 +184,13 @@ class DnsCherry(object):
                 'content': content
                 }
 
+
         return self.temp_result.render(
                 record = new_record,
                 zone_list = self.zone_list,
-                current_zone = zone
+                current_zone = zone,
+                message = self.sucess_message_add,
+                alert = 'success',
                 )
 
 cherrypy.quickstart(DnsCherry())
