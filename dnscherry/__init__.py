@@ -90,31 +90,6 @@ class DnsCherry(object):
         # return the list of records sorted by record type
         return sorted(records, key=itemgetter('type'))  
 
-    @cherrypy.expose
-    def index(self, zone=None, **params):
-        parse_query_string(cherrypy.request.query_string)
-        # zone is defined by the query string parameter
-        # if query string is empty, use the default zone
-        if zone is None:
-            zone = self.zone_default
-        try:
-            records = self._refresh_zone(zone)
-        # exception handling if impossible to get the zone
-        # (dns unavailable, misconfiguration, etc)
-        except dns.exception.FormError:
-            raise cherrypy.HTTPError(500, 'unable to get Zone [' + zone +  ']\
-                    from DNS [' + self.zone_list[zone]['ip'] + ']')
-        except KeyError:
-            raise cherrypy.HTTPError(400, 'Bad Zone [' + zone +  ']')
-        return self.temp_index.render(
-                records=records, 
-                zone_list=self.zone_list,
-                default_ttl = self.default_ttl,
-                type_written = self.type_written,
-                current_zone = zone
-                )
-
-
     def _manage_record(self, key=None, ttl=None, type=None,
             zone=None, content=None, action=None):
         
@@ -144,6 +119,30 @@ class DnsCherry(object):
         except PeerBadKey as e:
             raise cherrypy.HTTPError(500, ' Bad auth for zone [' + zone +  ']\
                     on DNS [' + self.zone_list[zone]['ip'] + ']')
+
+    @cherrypy.expose
+    def index(self, zone=None, **params):
+        parse_query_string(cherrypy.request.query_string)
+        # zone is defined by the query string parameter
+        # if query string is empty, use the default zone
+        if zone is None:
+            zone = self.zone_default
+        try:
+            records = self._refresh_zone(zone)
+        # exception handling if impossible to get the zone
+        # (dns unavailable, misconfiguration, etc)
+        except dns.exception.FormError:
+            raise cherrypy.HTTPError(500, 'unable to get Zone [' + zone +  ']\
+                    from DNS [' + self.zone_list[zone]['ip'] + ']')
+        except KeyError:
+            raise cherrypy.HTTPError(400, 'Bad Zone [' + zone +  ']')
+        return self.temp_index.render(
+                records=records, 
+                zone_list=self.zone_list,
+                default_ttl = self.default_ttl,
+                type_written = self.type_written,
+                current_zone = zone
+                )
 
     @cherrypy.expose
     def del_record(self, record=None, zone=None):
