@@ -9,9 +9,14 @@
                 </h4>
             </div>
         </div>
-    </div>
-    <div class="row clearfix top-buffer">
+   </div>
+    <div class="row clearfix">
         <div class="col-md-12 column">
+            %if action == 'add':
+            <h4>Added record(s):</h4>
+            %elif action == 'del':
+            <h4>Removed record(s):</h4>
+            %endif
             <div class="well well-sm">
                 <form method='POST' action='del_record/' role="form" class="form-inline">
                     <input type="hidden" name="zone" value="${current_zone}" />

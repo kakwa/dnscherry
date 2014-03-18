@@ -190,6 +190,7 @@ class DnsCherry(object):
                 current_zone = zone,
                 message = self.sucess_message_add,
                 alert = 'success',
+                action = 'add'
                 )
 
 cherrypy.quickstart(DnsCherry())
