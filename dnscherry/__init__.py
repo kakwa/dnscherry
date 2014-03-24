@@ -1,19 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim:set expandtab tabstop=4 shiftwidth=4:
 
+#generic imports
+import json
+import sys
+from operator import itemgetter
+
+#dnspython imports
 import dns.query
 import dns.zone
 import dns.tsigkeyring
 from dns.tsig import PeerBadKey
 import dns.update
-from operator import itemgetter
 from dns.exception import DNSException
 from dns.rdataclass import *
 from dns.rdatatype import *
-import sys
 
+#cherrypy http framework imports
 import cherrypy
 from cherrypy.lib.httputil import parse_query_string
+
+#mako template engines imports
 from mako.template import Template
 from mako import lookup
 
