@@ -72,7 +72,11 @@ setup(
     license = license,
     description = small_description, 
     long_description = description,
-    install_requires = [],
+    install_requires = [
+        'CherryPy >= 3.0.0',
+        'dnspython',
+        'Mako'
+        ],
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     classifiers=[
