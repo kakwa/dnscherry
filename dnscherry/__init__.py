@@ -63,7 +63,7 @@ class DnsCherry(object):
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
                 dir=resource_dir)
-        cherrypy.tree.mount(static_handler, '/static/')
+        cherrypy.tree.mount(static_handler, '/static/', self.)
 
     def _refresh_zone(self, zone = None):
         """get the dns zone 'zone'.
@@ -220,4 +220,7 @@ class DnsCherry(object):
                 action = 'add'
                 )
 
-cherrypy.quickstart(DnsCherry())
+#cherrypy.tree.mount(DnsCherry())
+# CherryPy autoreload must be disabled for the flup server to work
+#cherrypy.config.update({'engine.autoreload.on':False})
+#cherrypy.quickstart(DnsCherry())
