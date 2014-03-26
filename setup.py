@@ -9,7 +9,7 @@ from distutils.core import setup
 
 #some install path variables
 sysconfdir = os.getenv("SYSCONFDIR", "/etc")
-datarootdir = os.getenv("DATAROOTDIR", os.path.join(sys.prefix, 'share'))
+datarootdir = os.getenv("DATAROOTDIR", sys.prefix)
 
 data_dir = os.path.join(sys.prefix, 'share' ,'dnscherry')
 small_description = 'A simple web application to manage DNS zones'
@@ -58,6 +58,14 @@ def get_list_files(basedir, targetdir):
         return_list.append((os.path.join(targetdir, subpath), files_list))
     return return_list
 
+resources_files = get_list_files('resources', 
+    os.path.join(datarootdir, 'share', 'dnscherry'))
+
+resources_files.append((
+        os.path.join(sysconfdir, 'dnscherry'),
+        [ 'conf/dnscherry.ini']
+    ))
+
 setup(
     name = 'dnscherry',
     version = '0.0.0',
@@ -65,9 +73,8 @@ setup(
     author = 'Pierre-Francois Carpentier',
     author_email = 'carpentier.pf@gmail.com',
     packages = ['dnscherry'],
-    package_dir = {'dnscherry': 'resources'},
-    data_files = get_list_files('resources', datarootdir),
-    #scripts = ['scripts/asciigraph'],
+    data_files = resources_files,
+    #scripts = [''],
     url = 'https://github.com/kakwa/dnscherry',
     license = license,
     description = small_description, 
