@@ -1,3 +1,4 @@
+import cherrypy
 from dnscherry import DnsCherry
 
 cherrypy.tree.mount(DnsCherry())

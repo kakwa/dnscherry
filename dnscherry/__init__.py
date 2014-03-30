@@ -63,7 +63,7 @@ class DnsCherry(object):
         # enable serving static content threw cherrypy
         static_handler = cherrypy.tools.staticdir.handler(section="/", 
                 dir=resource_dir)
-        cherrypy.tree.mount(static_handler, '/static/', self.)
+        cherrypy.tree.mount(static_handler, '/static/')
 
     def _refresh_zone(self, zone = None):
         """get the dns zone 'zone'.
