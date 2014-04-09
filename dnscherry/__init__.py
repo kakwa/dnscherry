@@ -5,6 +5,7 @@
 #generic imports
 import json
 import sys
+import re
 from operator import itemgetter
 
 #dnspython imports
@@ -25,45 +26,69 @@ from cherrypy.lib.httputil import parse_query_string
 from mako.template import Template
 from mako import lookup
 
-resource_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/static/'
-template_dir = '/home/kakwa/Geek/GitHub/dnscherry/resources/templates/'
-zone_list = {'example.com': {'ip': '127.0.0.1', 'key': 'ujeGPu0NCU1TO9fQKiiuXg==', 'algorithm': 'hmac-md5'},
-        }
-zone_default2 = 'example.com'
-type_displayed = [ 'A', 'AAAA', 'CNAME']
-type_written = [ 'A', 'AAAA', 'CNAME', 'MX', 'CACA']
-default_ttl = '3600'
-
 class DnsCherry(object):
 
-    def __init__(self):
-        # definition of resource directory (css, js, img...)
-        self.resource_dir = resource_dir
+    def reload(self, config = None):
+
         # definition of the template directory
-        self.template_dir = template_dir
-        # recovery of zones list (zones dnscherry will manage)
-        self.zone_list = zone_list
+        self.template_dir = config['resources']['template_dir']
         # configure the default zone (zone displayed by default)
-        self.zone_default = zone_default2
+        self.zone_default = config['dns']['default.zone']
         # configure the default ttl for the form
-        self.default_ttl = default_ttl
+        self.default_ttl = config['dns']['default.ttl']
         # configure the list of dns entry type to display
-        self.type_displayed = type_displayed
+        self.type_displayed = re.split('\W+', 
+                    config['dns']['type.displayed']
+                )
         # configure the list of dns entry type a user can write
-        self.type_written = type_written
+        self.type_written = re.split('\W+',
+                    config['dns']['type.written']
+                )
+            
         # preload templates
-        self.temp_lookup = lookup.TemplateLookup(directories=self.template_dir, input_encoding='utf-8')
+        self.temp_lookup = lookup.TemplateLookup(
+                directories=self.template_dir, input_encoding='utf-8'
+                )
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
         self.temp_result = self.temp_lookup.get_template('result.tmpl')
 
-        #some static messages
+        # some static messages
         self.sucess_message_add = """New record(s) successfully added!"""
         self.sucess_message_del = """New record(s) successfully deleted!"""
 
-        # enable serving static content threw cherrypy
-        static_handler = cherrypy.tools.staticdir.handler(section="/", 
-                dir=resource_dir)
-        cherrypy.tree.mount(static_handler, '/static/')
+        # zones section parsing
+        self.zone_list = {}
+        self._parse_zones(config)
+
+
+    def _parse_zones(self, config):
+
+        # each entry in dns.zones is a zone parameters
+        # format <key>.<zone> = '<value>'
+        # list of the keys: ip, algorithm, key
+        for entry in config['dns.zones']:
+
+            # split at the first dot
+            key, sep, zone = entry.partition('.')
+            value = config['dns.zones'][entry]
+
+            # create or complete the zone entry
+            # in self.zone_list, depending if
+            # it's already initialized
+            # 
+            # self.zone_list is a dict of dict, 
+            # ex:
+            # self.zone_list = {'example.com': 
+            #               {   'ip': '127.0.0.1', 
+            #                   'key': 'ujeGPu0NCU1TO9fQKiiuXg==',
+            #                   'algorithm': 'hmac-md5'
+            #               },
+            #   }
+            if zone in self.zone_list:
+                self.zone_list[zone][key] = value 
+            else:
+                self.zone_list[zone] = { key : value } 
+
 
     def _refresh_zone(self, zone = None):
         """get the dns zone 'zone'.
@@ -220,7 +245,3 @@ class DnsCherry(object):
                 action = 'add'
                 )
 
-#cherrypy.tree.mount(DnsCherry())
-# CherryPy autoreload must be disabled for the flup server to work
-#cherrypy.config.update({'engine.autoreload.on':False})
-#cherrypy.quickstart(DnsCherry())

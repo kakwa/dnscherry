@@ -74,7 +74,7 @@ setup(
     author_email = 'carpentier.pf@gmail.com',
     packages = ['dnscherry'],
     data_files = resources_files,
-    #scripts = [''],
+    scripts = ['scripts/dnscherryd'],
     url = 'https://github.com/kakwa/dnscherry',
     license = license,
     description = small_description, 
