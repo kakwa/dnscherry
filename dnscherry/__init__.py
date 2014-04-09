@@ -54,7 +54,7 @@ class DnsCherry(object):
 
         # some static messages
         self.sucess_message_add = """New record(s) successfully added!"""
-        self.sucess_message_del = """New record(s) successfully deleted!"""
+        self.sucess_message_del = """Record(s) successfully deleted!"""
 
         # zones section parsing
         self.zone_list = {}
