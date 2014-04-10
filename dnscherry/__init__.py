@@ -27,6 +27,12 @@ from cherrypy.lib.httputil import parse_query_string
 from mako.template import Template
 from mako import lookup
 
+class NoRecordSelected(Exception):
+    pass
+
+class WrongDnsUpdateMethod(Exception):
+    pass
+
 class DnsCherry(object):
 
     def reload(self, config = None):
@@ -164,7 +170,7 @@ class DnsCherry(object):
             type = str(type)
             update.delete(key, type)
         else:
-            raise NameError('UnhandleDnsUpdateMethod')
+            raise WrongDnsUpdateMethod 
 
         response = dns.query.tcp(update, self.zone_list[zone]['ip'])
 
@@ -209,6 +215,15 @@ class DnsCherry(object):
                         zone_list = self.zone_list,
                         current_zone = zone
                 )
+        except NoRecordSelected:
+            cherrypy.response.status = 400 
+            return self.temp_error.render(
+                        alert = 'warning',
+                        message = 'No record selected.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
+
         except UnknownRdatatype:
             cherrypy.response.status = 500 
             return self.temp_error.render(
@@ -252,7 +267,9 @@ class DnsCherry(object):
     def del_record(self, record=None, zone=None):
 
         # if we select only on entry, it's a string and not a list
-        if not isinstance(record, list):
+        if record is None:
+            return self._error_handler(NoRecordSelected, zone)
+        elif not isinstance(record, list):
             record = [record]
 
         deleted_records = []
