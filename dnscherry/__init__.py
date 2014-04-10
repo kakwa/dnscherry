@@ -6,6 +6,7 @@
 import json
 import sys
 import re
+import traceback
 from operator import itemgetter
 
 #dnspython imports
@@ -51,6 +52,7 @@ class DnsCherry(object):
                 )
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
         self.temp_result = self.temp_lookup.get_template('result.tmpl')
+        self.temp_error = self.temp_lookup.get_template('error.tmpl')
 
         # some static messages
         self.sucess_message_add = """New record(s) successfully added!"""
@@ -75,7 +77,6 @@ class DnsCherry(object):
             return dns.tsig.HMAC_SHA512
         else:
             return None
-
 
     def _parse_zones(self, config):
 
@@ -154,26 +155,76 @@ class DnsCherry(object):
                     )
                 )
 
+        if action == 'add':
+            ttl = int(ttl)
+            content = str(content)
+            type = str(type)
+            update.add(key, ttl, type, content)
+        elif action == 'del':
+            type = str(type)
+            update.delete(key, type)
+        else:
+            raise NameError('UnhandleDnsUpdateMethod')
+
+        response = dns.query.tcp(update, self.zone_list[zone]['ip'])
+
+    def _reraise(self, exception):
+        raise exception
+    
+    def _error_handler(self, exception, zone=''):
+        #print(traceback.format_exc())
+        zone = str(zone)
         try:
-            if action == 'add':
-                ttl = int(ttl)
-                content = str(content)
-                type = str(type)
-                update.add(key, ttl, type, content)
-            elif action == 'del':
-                type = str(type)
-                update.delete(key, type)
-            else:
-                raise NameError('UnhandleDnsUpdateMethod')
+            self._reraise(exception)
+        except dns.exception.FormError:
+            cherrypy.response.status = 500 
+            return self.temp_error.render(
+                        alert = 'danger',
+                        message = 'Unable to get Zone "' + zone +  '".',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
+
+        except KeyError:
+            cherrypy.response.status = 400
+            return self.temp_error.render(
+                        alert = 'warning',
+                        message = 'Zone "' + zone +  '" not configured.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
+        except PeerBadKey:
+            cherrypy.response.status = 500 
+            return self.temp_error.render(
+                        alert = 'danger',
+                        message = 'Modification on zone "' + zone +  '" refused by DNS.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
         except dns.exception.SyntaxError:
-            raise cherrypy.HTTPError(400, 'Wrong form data, bad format')
+            cherrypy.response.status = 400 
+            return self.temp_error.render(
+                        alert = 'warning',
+                        message = 'Wrong form data, bad format.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
         except UnknownRdatatype:
-            raise cherrypy.HTTPError(500, 'Unknown record type')
-        try:
-            response = dns.query.tcp(update, self.zone_list[zone]['ip'])
-        except PeerBadKey as e:
-            raise cherrypy.HTTPError(500, ' Bad auth for zone [' + zone +  ']\
-                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+            cherrypy.response.status = 500 
+            return self.temp_error.render(
+                        alert = 'danger',
+                        message = 'Unknown record type',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
+        except:
+            cherrypy.response.status = 500 
+            return self.temp_error.render(
+                        alert = 'danger',
+                        message = 'Unkwown error.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
 
     @cherrypy.expose
     def index(self, zone=None, **params):
@@ -186,11 +237,9 @@ class DnsCherry(object):
             records = self._refresh_zone(zone)
         # exception handling if impossible to get the zone
         # (dns unavailable, misconfiguration, etc)
-        except dns.exception.FormError:
-            raise cherrypy.HTTPError(500, 'unable to get Zone [' + zone +  ']\
-                    from DNS [' + self.zone_list[zone]['ip'] + ']')
-        except KeyError:
-            raise cherrypy.HTTPError(400, 'Bad Zone [' + zone +  ']')
+        except Exception as e:
+            return self._error_handler(e, zone)
+
         return self.temp_index.render(
                 records=records, 
                 zone_list=self.zone_list,
@@ -224,11 +273,10 @@ class DnsCherry(object):
             deleted_records.append(del_record)
             try:
                 self._manage_record(key=key, type=type, zone=zone, action='del')
-            except 'PeerBadKey':
-                raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
-                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+            except Exception as e:
+                return self._error_handler(e, zone)
 
-
+    
         return self.temp_result.render(
                 records = deleted_records,
                 zone_list = self.zone_list,
@@ -244,9 +292,8 @@ class DnsCherry(object):
 
         try:
             self._manage_record(key, ttl, type, zone, content, 'add')
-        except 'PeerBadKey':
-            raise cherrypy.HTTPError(500, ' Bad auth for [' + zone +  ']\
-                    on DNS [' + self.zone_list[zone]['ip'] + ']')
+        except Exception as e:
+            return self._error_handler(e, zone)
 
         new_record = [{
                 'key': key,
