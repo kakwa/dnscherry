@@ -2,6 +2,7 @@
 """The CherryPy daemon."""
 
 import sys
+import os.path
 
 import cherrypy
 from cherrypy.process import plugins, servers
@@ -98,6 +99,14 @@ if __name__ == '__main__':
     if options.Path:
         for p in options.Path:
             sys.path.insert(0, p)
+
+    if options.config is None:
+        print('-c|--config <path/to/config/file> is mandatory')
+        exit(1)
+
+    if not os.path.isfile(options.config):
+        print('configuration file "'+ options.config + '" doesn\'t exsist' )
+        exit(1)
     
     start(options.config, options.daemonize,
           options.environment, options.fastcgi, options.scgi,
