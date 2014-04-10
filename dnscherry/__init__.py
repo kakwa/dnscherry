@@ -60,6 +60,22 @@ class DnsCherry(object):
         self.zone_list = {}
         self._parse_zones(config)
 
+    def _select_algorithm(self, algo):
+        if algo.lower() == "hmac-md5":
+            return dns.tsig.HMAC_MD5
+        elif algo == "hmac-md5":
+            return dns.tsig.HMAC_SHA1
+        elif algo == "hmac-sha224":
+            return dns.tsig.HMAC_SHA224
+        elif algo == "hmac-sha256":
+            return dns.tsig.HMAC_SHA256
+        elif algo == "hmac-sha384":
+            return dns.tsig.HMAC_SHA384
+        elif algo == "hmac-sha512":
+            return dns.tsig.HMAC_SHA512
+        else:
+            return None
+
 
     def _parse_zones(self, config):
 
@@ -131,7 +147,12 @@ class DnsCherry(object):
             zone : self.zone_list[zone]['key']
         })
 
-        update = dns.update.Update(zone + '.' , keyring=keyring)
+        update = dns.update.Update(zone + '.' , 
+                keyring=keyring,
+                keyalgorithm=self._select_algorithm(
+                    self.zone_list[zone]['algorithm']
+                    )
+                )
 
         try:
             if action == 'add':
