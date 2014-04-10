@@ -63,7 +63,7 @@ class DnsCherry(object):
     def _select_algorithm(self, algo):
         if algo.lower() == "hmac-md5":
             return dns.tsig.HMAC_MD5
-        elif algo == "hmac-md5":
+        elif algo == "hmac-sha1":
             return dns.tsig.HMAC_SHA1
         elif algo == "hmac-sha224":
             return dns.tsig.HMAC_SHA224
