@@ -8,4 +8,4 @@ cd `dirname $0`
 dnscherryd -d -p /tmp/dnscherry.pid -c /etc/dnscherry/dnscherry.ini
 
 #stoping dnscherryd
-kill `cat /tmp/dnscherry.pid`
+pkill dnscherryd
