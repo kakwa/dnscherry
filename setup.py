@@ -14,6 +14,23 @@ datarootdir = os.getenv("DATAROOTDIR", sys.prefix)
 data_dir = os.path.join(sys.prefix, 'share' ,'dnscherry')
 small_description = 'A simple web application to manage DNS zones'
 
+# change requirements according to python version
+if sys.version_info[0] == 2:
+    install_requires = [
+        'CherryPy >= 3.0.0',
+        'dnspython',
+        'Mako'
+        ],
+elif: sys.version_info[0] == 3:
+    install_requires = [
+        'CherryPy >= 3.0.0',
+        'dnspython3',
+        'Mako'
+        ],
+else:
+    print('unsupported version')
+    exit(1)
+
 try:
     f = open(os.path.join(os.path.dirname(__file__), 'README.rst'))
     description = f.read()
@@ -79,11 +96,7 @@ setup(
     license = license,
     description = small_description, 
     long_description = description,
-    install_requires = [
-        'CherryPy >= 3.0.0',
-        'dnspython',
-        'Mako'
-        ],
+    install_requires = install_requires,
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     classifiers=[
