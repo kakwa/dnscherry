@@ -1,3 +1,8 @@
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install bind9
+
+
 language: python
 python:
   - "2.7"
@@ -7,4 +12,4 @@ python:
 install: 
   - pip install -e . --use-mirrors
 # command to run tests
-#script: "./run_test.sh"
+script: "./run_test.sh"
