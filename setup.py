@@ -21,7 +21,7 @@ if sys.version_info[0] == 2:
         'dnspython',
         'Mako'
         ],
-elif: sys.version_info[0] == 3:
+elif sys.version_info[0] == 3:
     install_requires = [
         'CherryPy >= 3.0.0',
         'dnspython3',
