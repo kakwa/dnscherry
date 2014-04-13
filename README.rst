@@ -32,11 +32,12 @@ dynamic updates.
 Screenshots
 ===========
 
+.. image:: https://raw.githubusercontent.com/kakwa/dnscherry/master/docs/images/main_screen.png
+
 License
 =======
 
 Dnscherry is released under the MIT public license.
-
 
 Installation
 ============
