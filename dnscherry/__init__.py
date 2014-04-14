@@ -8,6 +8,7 @@ import sys
 import re
 import traceback
 from operator import itemgetter
+from socket import error as socket_error
 
 #dnspython imports
 import dns.query
@@ -69,7 +70,10 @@ class DnsCherry(object):
         self._parse_zones(config)
 
     def _select_algorithm(self, algo):
-        if algo.lower() == "hmac-md5":
+
+        algo = algo.lower()
+
+        if   algo == "hmac-md5":
             return dns.tsig.HMAC_MD5
         elif algo == "hmac-sha1":
             return dns.tsig.HMAC_SHA1
@@ -190,6 +194,16 @@ class DnsCherry(object):
                         zone_list = self.zone_list,
                         current_zone = zone
                 )
+
+        except socket_error:
+            cherrypy.response.status = 500 
+            return self.temp_error.render(
+                        alert = 'danger',
+                        message = 'Unable to contact DNS.',
+                        zone_list = self.zone_list,
+                        current_zone = zone
+                )
+
 
         except KeyError:
             cherrypy.response.status = 400
