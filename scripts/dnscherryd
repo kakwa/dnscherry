@@ -18,8 +18,7 @@ def start(configfile=None, daemonize=False, environment=None,
     
     instance = DnsCherry()
     app = cherrypy.tree.mount(instance, '/', configfile)
-    # CherryPy autoreload must be disabled for the flup server to work
-    cherrypy.config.update({'engine.autoreload.on':False})
+    cherrypy.config.update(configfile)
     instance.reload(app.config)
 
     engine = cherrypy.engine
