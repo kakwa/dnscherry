@@ -10,5 +10,10 @@ dnscherryd -d -p /tmp/dnscherry.pid -c /etc/dnscherry/dnscherry.ini
 #sleep a few seconds
 sleep 5
 
-#stoping dnscherryd
-pkill dnscherryd
+python setup.py test
+ret=$?
+
+#stoping violently dnscherryd
+pkill -9 dnscherryd
+
+exit $ret
