@@ -97,7 +97,7 @@ setup(
     description = small_description, 
     long_description = description,
     install_requires = install_requires,
-    tests_require=['pytest'],
+    tests_require=['pytest', 'mechanize'],
     cmdclass={'test': PyTest},
     classifiers=[
 	'Development Status :: 4 - Beta',
