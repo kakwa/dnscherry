@@ -3,3 +3,7 @@
 sudo rsync -a `dirname $0`/ /
 sudo chown -R bind:bind /etc/bind/
 sudo /etc/init.d/bind9 restart
+cd `dirname $0`/../../
+sudo sed -i "s%template_dir.*%template_dir = '`pwd`/resources/templates/'%" /etc/dnscherry/dnscherry.ini
+sudo sed -i "s%tools.staticdir.dir.*%tools.staticdir.dir = '`pwd`/resources/static/'%" /etc/dnscherry/dnscherry.ini
+
