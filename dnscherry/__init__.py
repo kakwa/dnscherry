@@ -3,7 +3,6 @@
 # vim:set expandtab tabstop=4 shiftwidth=4:
 
 #generic imports
-import json
 import sys
 import re
 import traceback
