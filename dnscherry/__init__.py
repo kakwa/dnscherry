@@ -183,76 +183,64 @@ class DnsCherry(object):
     def _error_handler(self, exception, zone=''):
         #print(traceback.format_exc())
         zone = str(zone)
-        try:
-            self._reraise(exception)
-        except dns.exception.FormError:
-            cherrypy.response.status = 500 
+
+        def render_error(alert, message):
             return self.temp_error.render(
-                        alert = 'danger',
-                        message = 'Unable to get Zone "' + zone +  '".',
+                        alert = alert,
+                        message = message,
                         zone_list = self.zone_list,
                         current_zone = zone
                 )
+        try:
+            self._reraise(exception)
+
+        except dns.exception.FormError:
+            cherrypy.response.status = 500 
+            alert = 'danger'
+            message = 'Unable to get Zone "' + zone +  '".'
+            return render_error(alert, message)
 
         except socket_error:
             cherrypy.response.status = 500 
-            return self.temp_error.render(
-                        alert = 'danger',
-                        message = 'Unable to contact DNS.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
-
+            alert = 'danger'
+            message = 'Unable to contact DNS.'
+            return render_error(alert, message)
 
         except KeyError:
             cherrypy.response.status = 400
-            return self.temp_error.render(
-                        alert = 'warning',
-                        message = 'Zone "' + zone +  '" not configured.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'warning'
+            message = 'Zone "' + zone +  '" not configured.'
+            return render_error(alert, message)
+
         except PeerBadKey:
             cherrypy.response.status = 500 
-            return self.temp_error.render(
-                        alert = 'danger',
-                        message = 'Modification on zone "' + zone +  '" refused by DNS.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'danger'
+            message = 'Modification on zone "' + zone +  '" refused by DNS.'
+            return render_error(alert, message)
+
         except dns.exception.SyntaxError:
             cherrypy.response.status = 400 
-            return self.temp_error.render(
-                        alert = 'warning',
-                        message = 'Wrong form data, bad format.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'warning'
+            message = 'Wrong form data, bad format.'
+            return render_error(alert, message)
+
         except NoRecordSelected:
             cherrypy.response.status = 400 
-            return self.temp_error.render(
-                        alert = 'warning',
-                        message = 'No record selected.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'warning'
+            message = 'No record selected.'
+            return render_error(alert, message)
 
         except UnknownRdatatype:
             cherrypy.response.status = 500 
-            return self.temp_error.render(
-                        alert = 'danger',
-                        message = 'Unknown record type',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'danger'
+            message = 'Unknown record type'
+            return render_error(alert, message)
+
         except:
             cherrypy.response.status = 500 
-            return self.temp_error.render(
-                        alert = 'danger',
-                        message = 'Unkwown error.',
-                        zone_list = self.zone_list,
-                        current_zone = zone
-                )
+            alert = 'danger'
+            message = 'Unkwown error.'
+            return render_error(alert, message)
 
     @cherrypy.expose
     def index(self, zone=None, **params):
