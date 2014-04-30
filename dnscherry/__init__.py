@@ -74,8 +74,17 @@ class DnsCherry(object):
                     config['dns']['type.written']
                 )
 
-        # log configuration handling
+        if config['global']['form.add.redirect'] == 'on':
+            self.form_add_redirect = True
+        else:
+            self.form_add_redirect = False
 
+        if config['global']['form.del.redirect'] == 'on':
+            self.form_del_redirect = True
+        else:
+            self.form_del_redirect = False
+
+        # log configuration handling
         # set log level (if not in configuration file, log level is set to debug)
         if 'log.level' in config['global']:
             level = self._get_loglevel(config['global']['log.level'])
@@ -388,12 +397,13 @@ class DnsCherry(object):
                 return self._error_handler(e, zone)
 
             message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
-%(content)s' removed by '%(user)s'" % {
+%(content)s' removed by '%(user)s' on zone '%(zone)s'" % {
                     'key': key,
                     'ttl': ttl,
                     'class': 'IN',
                     'type': type,
                     'content': content,
+                    'zone': zone,
                     'user': 'unknown'
                     }
 
@@ -401,15 +411,18 @@ class DnsCherry(object):
                 msg = message,
                 severity = logging.INFO
             )
-    
-        return self.temp_result.render(
-                records = deleted_records,
-                zone_list = self.zone_list,
-                current_zone = zone,
-                message = self.sucess_message_del,
-                alert = 'success',
-                action = 'del'
-                )
+        
+        if self.form_del_redirect:
+            raise cherrypy.HTTPRedirect("/?zone=" + zone)
+        else:
+            return self.temp_result.render(
+                    records = deleted_records,
+                    zone_list = self.zone_list,
+                    current_zone = zone,
+                    message = self.sucess_message_del,
+                    alert = 'success',
+                    action = 'del'
+                    )
 
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
@@ -429,12 +442,13 @@ class DnsCherry(object):
                 }]
 
         message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
-%(content)s' added by '%(user)s'" % {
+%(content)s' added by '%(user)s' on zone '%(zone)s'" % {
                     'key': key,
                     'ttl': ttl,
                     'class': 'IN',
                     'type': type,
                     'content': content,
+                    'zone': zone,
                     'user': 'unknown'
                     }
 
@@ -443,12 +457,15 @@ class DnsCherry(object):
             severity = logging.INFO
          )
 
-        return self.temp_result.render(
-                records = new_record,
-                zone_list = self.zone_list,
-                current_zone = zone,
-                message = self.sucess_message_add,
-                alert = 'success',
-                action = 'add'
-                )
+        if self.form_add_redirect:
+            raise cherrypy.HTTPRedirect("/?zone=" + zone)
+        else:
+            return self.temp_result.render(
+                    records = new_record,
+                    zone_list = self.zone_list,
+                    current_zone = zone,
+                    message = self.sucess_message_add,
+                    alert = 'success',
+                    action = 'add'
+                    )
 
