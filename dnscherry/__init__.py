@@ -6,6 +6,8 @@
 import sys
 import re
 import traceback
+import logging
+import logging.handlers
 from operator import itemgetter
 from socket import error as socket_error
 
@@ -35,6 +37,26 @@ class WrongDnsUpdateMethod(Exception):
 
 class DnsCherry(object):
 
+    def _get_loglevel(self, level):
+        if level == 'debug':
+            return logging.DEBUG
+        elif level == 'notice':
+            return logging.NOTICE
+        elif level == 'info':
+            return logging.INFO
+        elif level == 'warning' or level == 'warn':
+            return logging.WARNING
+        elif level == 'error' or level == 'err':
+            return logging.ERROR
+        elif level == 'critical' or level == 'crit':
+            return logging.CRITICAL
+        elif level == 'alert':
+            return logging.ALERT
+        elif level == 'emergency' or level == 'emerg':
+            return logging.EMERGENCY
+        else:
+            return logging.INFO
+
     def reload(self, config = None):
 
         # definition of the template directory
@@ -51,6 +73,54 @@ class DnsCherry(object):
         self.type_written = re.split('\W+',
                     config['dns']['type.written']
                 )
+
+        # log configuration handling
+
+        # set log level (if not in configuration file, log level is set to debug)
+        if 'log.level' in config['global']:
+            level = self._get_loglevel(config['global']['log.level'])
+        else: 
+            level = self._get_loglevel('debug')
+
+        # log format for syslog
+        syslog_formatter = logging.Formatter("dnscherry[%(process)d]: %(message)s")
+
+        # replace access log handler by a syslog handler
+        if   config['global']['log.access_handler'] == 'syslog':
+            cherrypy.log.access_file = ""
+            handler = logging.handlers.SysLogHandler(address = '/dev/log', facility='user')
+            handler.setFormatter(syslog_formatter)
+            cherrypy.log.access_log.addHandler(handler)
+
+        elif config['global']['log.access_handler'] == 'file':
+            pass
+
+        if   config['global']['log.error_handler'] == 'syslog':
+            cherrypy.log.error_file = ""
+
+            # redefining log.error method because cherrypy does weird things like
+            # adding the date inside the message or adding space even if context
+            # is empty (by the way, what's the use of "context"?)
+            def syslog_error(msg='', context='', severity=logging.INFO, traceback=False):
+                if traceback:
+                    msg += cherrypy._cperror.format_exc()
+                if context == '':
+                    cherrypy.log.error_log.log(severity, msg)
+                else:
+                    cherrypy.log.error_log.log(severity, ' '.join((context, msg)))
+            cherrypy.log.error = syslog_error
+
+            # replacing the error handler by a syslog handler
+            handler = logging.handlers.SysLogHandler(address = '/dev/log', facility='user')
+            handler.setFormatter(syslog_formatter)
+            cherrypy.log.error_log.addHandler(handler)
+
+        elif config['global']['log.error_handler'] == 'file':
+            pass
+
+        # set log level
+        cherrypy.log.error_log.setLevel(level)
+        cherrypy.log.access_log.setLevel(level)
             
         # preload templates
         self.temp_lookup = lookup.TemplateLookup(
@@ -67,6 +137,8 @@ class DnsCherry(object):
         # zones section parsing
         self.zone_list = {}
         self._parse_zones(config)
+
+
 
     def _select_algorithm(self, algo):
 
@@ -181,19 +253,40 @@ class DnsCherry(object):
         raise exception
     
     def _error_handler(self, exception, zone=''):
-        #print(traceback.format_exc())
+        # log the traceback as 'debug'
+        cherrypy.log.error(
+                msg = '',
+                severity = logging.DEBUG,
+                traceback= True
+                )
+
         zone = str(zone)
 
+        # log and error page handling
         def render_error(alert, message):
+            if alert == 'danger':
+                severity = logging.ERROR
+            elif alert == 'warning':
+                severity = logging.WARNING
+            else:
+                severity = logging.CRITICAL
+
+            cherrypy.log.error(
+                    msg = message,
+                    severity = severity
+                    )
+
             return self.temp_error.render(
                         alert = alert,
                         message = message,
                         zone_list = self.zone_list,
                         current_zone = zone
                 )
+        # reraise the exception
         try:
             self._reraise(exception)
 
+        # error handling
         except dns.exception.FormError:
             cherrypy.response.status = 500 
             alert = 'danger'
@@ -294,6 +387,20 @@ class DnsCherry(object):
             except Exception as e:
                 return self._error_handler(e, zone)
 
+            message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
+%(content)s' removed by '%(user)s'" % {
+                    'key': key,
+                    'ttl': ttl,
+                    'class': 'IN',
+                    'type': type,
+                    'content': content,
+                    'user': 'unknown'
+                    }
+
+            cherrypy.log.error(
+                msg = message,
+                severity = logging.INFO
+            )
     
         return self.temp_result.render(
                 records = deleted_records,
@@ -321,6 +428,20 @@ class DnsCherry(object):
                 'content': content
                 }]
 
+        message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
+%(content)s' added by '%(user)s'" % {
+                    'key': key,
+                    'ttl': ttl,
+                    'class': 'IN',
+                    'type': type,
+                    'content': content,
+                    'user': 'unknown'
+                    }
+
+        cherrypy.log.error(
+            msg = message,
+            severity = logging.INFO
+         )
 
         return self.temp_result.render(
                 records = new_record,
