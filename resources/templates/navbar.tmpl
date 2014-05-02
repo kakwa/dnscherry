@@ -20,7 +20,9 @@
 							</ul>
 						</li>
 					</ul>
-					<a class="navbar-brand navbar-right" href="https://github.com/kakwa/dnscherry" target="_blank">DnsCherry</a>
+                    %if logout_button:
+                    <a class="navbar-brand navbar-right" href='/logout'><span class="glyphicon glyphicon-off"> Logout</a>
+                    %endif
 				</div>
 			</nav>
 		</div>

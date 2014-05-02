@@ -293,6 +293,7 @@ class DnsCherry(object):
                     )
 
             return self.temp_error.render(
+                        logout_button = self.auth.logout_button,
                         alert = alert,
                         message = message,
                         zone_list = self.zone_list,
@@ -410,6 +411,7 @@ class DnsCherry(object):
             return self._error_handler(e, zone)
 
         return self.temp_index.render(
+                logout_button = self.auth.logout_button,
                 records=records, 
                 zone_list=self.zone_list,
                 default_ttl = self.default_ttl,
@@ -470,6 +472,7 @@ class DnsCherry(object):
             raise cherrypy.HTTPRedirect("/?zone=" + zone)
         else:
             return self.temp_result.render(
+                    logout_button = self.auth.logout_button,
                     records = deleted_records,
                     zone_list = self.zone_list,
                     current_zone = zone,
@@ -518,6 +521,7 @@ class DnsCherry(object):
             raise cherrypy.HTTPRedirect("/?zone=" + zone)
         else:
             return self.temp_result.render(
+                    logout_button = self.auth.logout_button,
                     records = new_record,
                     zone_list = self.zone_list,
                     current_zone = zone,
