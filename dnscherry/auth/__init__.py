@@ -26,4 +26,7 @@ class Auth(object):
         sess[SESSION_KEY] = None
         if username:
             cherrypy.request.login = None
+            return username
+        else:
+            return 'unknow'
 

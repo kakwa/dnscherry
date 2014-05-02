@@ -29,6 +29,8 @@ from cherrypy.lib.httputil import parse_query_string
 from mako.template import Template
 from mako import lookup
 
+SESSION_KEY = '_cp_username'
+
 class NoRecordSelected(Exception):
     pass
 
@@ -355,11 +357,38 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def login(self, login, password):
-        return ' '.join((login, password))
+        if self.auth.check_credentials(login, password):
+            message = "login success for user '%(user)s'" % {
+                'user': login
+            }
+            cherrypy.log.error(
+                msg = message,
+                severity = logging.INFO
+            )
+            cherrypy.session[SESSION_KEY] = cherrypy.request.login = login
+            raise cherrypy.HTTPRedirect("/")
+        else:
+            message = "login failed for user '%(user)s'" % {
+                'user': login
+            }
+            cherrypy.log.error(
+                msg = message,
+                severity = logging.WARNING
+            )
+            raise cherrypy.HTTPRedirect("/signin")
 
     @cherrypy.expose
     def logout(self):
-        return ''
+        user = self.auth.end_session()
+        message = "user '%(user)s' logout" % {
+            'user': user
+        }
+        cherrypy.log.error(
+            msg = message,
+            severity = logging.INFO
+        )
+
+        raise cherrypy.HTTPRedirect("/signin")
 
     @cherrypy.expose
     def index(self, zone=None, **params):
