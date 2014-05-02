@@ -89,7 +89,7 @@ setup(
     zip_safe=False,
     author = 'Pierre-Francois Carpentier',
     author_email = 'carpentier.pf@gmail.com',
-    packages = ['dnscherry'],
+    packages = ['dnscherry', 'dnscherry.auth'],
     data_files = resources_files,
     scripts = ['scripts/dnscherryd'],
     url = 'https://github.com/kakwa/dnscherry',
@@ -97,7 +97,12 @@ setup(
     description = small_description, 
     long_description = description,
     install_requires = install_requires,
-    tests_require=['pytest', 'mechanize'],
+    tests_require = ['pytest'],
+    extras_require = {
+            'auth_htpasswd' : ['passlib'],
+            'auth_ldap' : ['python-ldap'],
+            'fastcgi' : ['flup']
+        },
     cmdclass={'test': PyTest},
     classifiers=[
 	'Development Status :: 4 - Beta',
