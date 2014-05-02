@@ -130,7 +130,7 @@ class DnsCherry(object):
         # set log level
         cherrypy.log.error_log.setLevel(level)
         cherrypy.log.access_log.setLevel(level)
-            
+
         # preload templates
         self.temp_lookup = lookup.TemplateLookup(
                 directories=self.template_dir, input_encoding='utf-8'
@@ -138,7 +138,12 @@ class DnsCherry(object):
         self.temp_index = self.temp_lookup.get_template('index.tmpl')
         self.temp_result = self.temp_lookup.get_template('result.tmpl')
         self.temp_error = self.temp_lookup.get_template('error.tmpl')
+        self.temp_login = self.temp_lookup.get_template('login.tmpl')
 
+        # loading the authentification module
+        auth = __import__(config['auth']['auth.module'], globals(), locals(), ['Auth'], -1)
+        self.auth = auth.Auth(config['auth'])
+            
         # some static messages
         self.sucess_message_add = """New record(s) successfully added!"""
         self.sucess_message_del = """Record(s) successfully deleted!"""
@@ -345,7 +350,24 @@ class DnsCherry(object):
             return render_error(alert, message)
 
     @cherrypy.expose
+    def signin(self):
+        return self.temp_login.render()
+
+    @cherrypy.expose
+    def login(self, login, password):
+        return ' '.join((login, password))
+
+    @cherrypy.expose
+    def logout(self):
+        return ''
+
+    @cherrypy.expose
     def index(self, zone=None, **params):
+
+        user = 'unknown'
+
+        user = self.auth.check_auth()
+
         parse_query_string(cherrypy.request.query_string)
         # zone is defined by the query string parameter
         # if query string is empty, use the default zone
@@ -368,6 +390,9 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def del_record(self, record=None, zone=None):
+
+        user = 'unknown'
+        user = self.auth.check_auth()
 
         # if we select only on entry, it's a string and not a list
         if record is None:
@@ -404,7 +429,7 @@ class DnsCherry(object):
                     'type': type,
                     'content': content,
                     'zone': zone,
-                    'user': 'unknown'
+                    'user': user 
                     }
 
             cherrypy.log.error(
@@ -427,6 +452,9 @@ class DnsCherry(object):
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
             zone=None, content=None):
+        
+        user = 'unknown'
+        user = self.auth.check_auth()
 
         try:
             self._manage_record(key, ttl, type, zone, content, 'add')
@@ -449,7 +477,7 @@ class DnsCherry(object):
                     'type': type,
                     'content': content,
                     'zone': zone,
-                    'user': 'unknown'
+                    'user': user
                     }
 
         cherrypy.log.error(
