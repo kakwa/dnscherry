@@ -11,7 +11,7 @@ class Auth(dnscherry.auth.Auth):
 
     def __init__(self, config):
         self.logout_button = True
-        self.ht = HtpasswdFile(config ['auth.htpasswd'])
+        self.ht = HtpasswdFile(config ['auth.htpasswd.file'])
 
     def check_credentials(self, username, password):
         return self.ht.check_password(username, password)

@@ -10,7 +10,7 @@ class Auth(dnscherry.auth.Auth):
         # no need for a logout button
         self.logout_button = False
         if 'auth.user_header_name' in config:
-            self.user_header_name = config ['auth.user_header_name']
+            self.user_header_name = config['auth.none.user_header_name']
         else:
             self.user_header_name = None
 
