@@ -14,6 +14,7 @@ from socket import error as socket_error
 #dnspython imports
 import dns.query
 import dns.zone
+import dns.name
 import dns.tsigkeyring
 from dns.tsig import PeerBadKey
 import dns.update
@@ -203,6 +204,11 @@ class DnsCherry(object):
             else:
                 self.zone_list[zone] = { key : value } 
 
+    def _validate_domain(self, domain):
+        if re.match('^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$', domain):
+            return True
+        else:
+            return False
 
     def _refresh_zone(self, zone = None):
         """get the dns zone 'zone'.
@@ -269,6 +275,7 @@ class DnsCherry(object):
         raise exception
     
     def _error_handler(self, exception, zone=''):
+
         # log the traceback as 'debug'
         cherrypy.log.error(
                 msg = '',
@@ -279,7 +286,7 @@ class DnsCherry(object):
         zone = str(zone)
 
         # log and error page handling
-        def render_error(alert, message):
+        def render_error(alert, message, zone=zone):
             if alert == 'danger':
                 severity = logging.ERROR
             elif alert == 'warning':
@@ -299,6 +306,16 @@ class DnsCherry(object):
                         zone_list = self.zone_list,
                         current_zone = zone
                 )
+
+        # first, we check if the zone name is valid
+        if not self._validate_domain(zone):
+            cherrypy.response.status = 400
+            return render_error(
+                alert = 'warning',
+                message = 'Bad zone name.',
+                zone = self.zone_default
+            )
+
         # reraise the exception
         try:
             self._reraise(exception)
