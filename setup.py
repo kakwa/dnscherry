@@ -84,33 +84,37 @@ resources_files.append((
     ))
 
 setup(
-    name = 'dnscherry',
-    version = '0.0.0',
-    zip_safe=False,
-    author = 'Pierre-Francois Carpentier',
-    author_email = 'carpentier.pf@gmail.com',
-    packages = ['dnscherry', 'dnscherry.auth'],
-    data_files = resources_files,
-    scripts = ['scripts/dnscherryd'],
-    url = 'https://github.com/kakwa/dnscherry',
-    license = license,
-    description = small_description, 
+    name             = 'dnscherry',
+    version          = '0.0.0',
+    author           = 'Pierre-Francois Carpentier',
+    author_email     = 'carpentier.pf@gmail.com',
+    packages         = ['dnscherry', 'dnscherry.auth'],
+    data_files       = resources_files,
+    scripts          = ['scripts/dnscherryd'],
+    url              = 'https://github.com/kakwa/dnscherry',
+    license          = license,
+    description      = small_description, 
     long_description = description,
     install_requires = install_requires,
-    tests_require = ['pytest'],
-    extras_require = {
+    tests_require    = ['pytest'],
+    extras_require   = {
             'auth_htpasswd' : ['passlib'],
             'auth_ldap' : ['python-ldap'],
             'fastcgi' : ['flup']
         },
-    cmdclass={'test': PyTest},
-    classifiers=[
-	'Development Status :: 4 - Beta',
-	'Intended Audience :: System Administrators',
-        'Environment :: Console',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3']
+    cmdclass         = {'test': PyTest},
+    classifiers      = [
+            'Development Status :: 3 - Alpha',
+            'Environment :: Web Environment',
+            'Framework :: CherryPy',
+	    'Intended Audience :: System Administrators',
+            'License :: OSI Approved :: MIT License',
+            'Natural Language :: English',
+            'Operating System :: POSIX',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.2',
+            'Programming Language :: Python :: 3.3',
+            'Topic :: Internet :: Name Service (DNS)'
+        ]
 )
