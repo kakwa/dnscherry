@@ -32,6 +32,7 @@ from mako import lookup
 
 SESSION_KEY = '_cp_username'
 
+# some custom exceptions
 class NoRecordSelected(Exception):
     pass
 
@@ -40,7 +41,132 @@ class WrongDnsUpdateMethod(Exception):
 
 class DnsCherry(object):
 
+    def reload(self, config = None):
+        """ load/reload the configuration
+        """
+
+        # definition of the template directory
+        self.template_dir = config['resources']['template_dir']
+        # configure the default zone (zone displayed by default)
+        self.zone_default = config['dns']['default.zone']
+        # configure the default ttl for the form
+        self.default_ttl = config['dns']['default.ttl']
+        # configure the list of dns entry type to display
+        self.type_displayed = re.split('\W+', 
+                    config['dns']['type.displayed']
+                )
+        # configure the list of dns entry type a user can write
+        self.type_written = re.split('\W+',
+                    config['dns']['type.written']
+                )
+
+        # set if redirect on zone page after add or if
+        # display a summary of the added entries
+        if config['global']['form.add.redirect'] == 'on':
+            self.form_add_redirect = True
+        else:
+            self.form_add_redirect = False
+
+        # same for delete
+        if config['global']['form.del.redirect'] == 'on':
+            self.form_del_redirect = True
+        else:
+            self.form_del_redirect = False
+
+        # log configuration handling
+        # get log level 
+        # (if not in configuration file, log level is set to debug)
+        if 'log.level' in config['global']:
+            level = self._get_loglevel(config['global']['log.level'])
+        else: 
+            level = self._get_loglevel('debug')
+
+        # log format for syslog
+        syslog_formatter = logging.Formatter(
+                "dnscherry[%(process)d]: %(message)s")
+
+        # replace access log handler by a syslog handler
+        if   config['global']['log.access_handler'] == 'syslog':
+            cherrypy.log.access_log.handlers = []
+            handler = logging.handlers.SysLogHandler(address = '/dev/log',
+                    facility='user')
+            handler.setFormatter(syslog_formatter)
+            cherrypy.log.access_log.addHandler(handler)
+
+        # if file, we keep the default
+        elif config['global']['log.access_handler'] == 'file':
+            pass
+
+        # replace access log handler by a null handler
+        elif config['global']['log.access_handler'] == 'none':
+            cherrypy.log.access_log.handlers = []
+            handler = logging.NullHandler()
+            cherrypy.log.access_log.addHandler(handler)
+
+        # replacing the error handler by a syslog handler
+        if   config['global']['log.error_handler'] == 'syslog':
+            cherrypy.log.error_log.handlers = []
+
+            # redefining log.error method because cherrypy does weird
+            # things like adding the date inside the message 
+            # or adding space even if context is empty 
+            # (by the way, what's the use of "context"?)
+            def syslog_error(msg='', context='', 
+                    severity=logging.INFO, traceback=False):
+                if traceback:
+                    msg += cherrypy._cperror.format_exc()
+                if context == '':
+                    cherrypy.log.error_log.log(severity, msg)
+                else:
+                    cherrypy.log.error_log.log(severity, 
+                            ' '.join((context, msg)))
+            cherrypy.log.error = syslog_error
+
+            handler = logging.handlers.SysLogHandler(address = '/dev/log',
+                    facility='user')
+            handler.setFormatter(syslog_formatter)
+            cherrypy.log.error_log.addHandler(handler)
+
+        # if file, we keep the default
+        elif config['global']['log.error_handler'] == 'file':
+            pass
+
+        # replacing the error handler by a null handler
+        elif config['global']['log.error_handler'] == 'none':
+            cherrypy.log.error_log.handlers = []
+            handler = logging.NullHandler()
+            cherrypy.log.error_log.addHandler(handler)
+
+        # set log level
+        cherrypy.log.error_log.setLevel(level)
+        cherrypy.log.access_log.setLevel(level)
+
+        # preload templates
+        self.temp_lookup = lookup.TemplateLookup(
+                directories=self.template_dir, input_encoding='utf-8'
+                )
+        self.temp_index = self.temp_lookup.get_template('index.tmpl')
+        self.temp_result = self.temp_lookup.get_template('result.tmpl')
+        self.temp_error = self.temp_lookup.get_template('error.tmpl')
+        self.temp_login = self.temp_lookup.get_template('login.tmpl')
+
+        # loading the authentification module
+        auth = __import__(config['auth']['auth.module'],
+                globals(), locals(), ['Auth'], -1)
+        self.auth = auth.Auth(config['auth'])
+            
+        # some static messages
+        self.sucess_message_add = """New record(s) successfully added!"""
+        self.sucess_message_del = """Record(s) successfully deleted!"""
+
+        # zones section parsing
+        self.zone_list = {}
+        self._parse_zones(config)
+
     def _get_loglevel(self, level):
+        """ transform a 'string' level into the
+        corresponding logging object
+        """
         if level == 'debug':
             return logging.DEBUG
         elif level == 'notice':
@@ -60,105 +186,12 @@ class DnsCherry(object):
         else:
             return logging.INFO
 
-    def reload(self, config = None):
-
-        # definition of the template directory
-        self.template_dir = config['resources']['template_dir']
-        # configure the default zone (zone displayed by default)
-        self.zone_default = config['dns']['default.zone']
-        # configure the default ttl for the form
-        self.default_ttl = config['dns']['default.ttl']
-        # configure the list of dns entry type to display
-        self.type_displayed = re.split('\W+', 
-                    config['dns']['type.displayed']
-                )
-        # configure the list of dns entry type a user can write
-        self.type_written = re.split('\W+',
-                    config['dns']['type.written']
-                )
-
-        if config['global']['form.add.redirect'] == 'on':
-            self.form_add_redirect = True
-        else:
-            self.form_add_redirect = False
-
-        if config['global']['form.del.redirect'] == 'on':
-            self.form_del_redirect = True
-        else:
-            self.form_del_redirect = False
-
-        # log configuration handling
-        # set log level (if not in configuration file, log level is set to debug)
-        if 'log.level' in config['global']:
-            level = self._get_loglevel(config['global']['log.level'])
-        else: 
-            level = self._get_loglevel('debug')
-
-        # log format for syslog
-        syslog_formatter = logging.Formatter("dnscherry[%(process)d]: %(message)s")
-
-        # replace access log handler by a syslog handler
-        if   config['global']['log.access_handler'] == 'syslog':
-            cherrypy.log.access_file = ""
-            handler = logging.handlers.SysLogHandler(address = '/dev/log', facility='user')
-            handler.setFormatter(syslog_formatter)
-            cherrypy.log.access_log.addHandler(handler)
-
-        elif config['global']['log.access_handler'] == 'file':
-            pass
-
-        if   config['global']['log.error_handler'] == 'syslog':
-            cherrypy.log.error_file = ""
-
-            # redefining log.error method because cherrypy does weird things like
-            # adding the date inside the message or adding space even if context
-            # is empty (by the way, what's the use of "context"?)
-            def syslog_error(msg='', context='', severity=logging.INFO, traceback=False):
-                if traceback:
-                    msg += cherrypy._cperror.format_exc()
-                if context == '':
-                    cherrypy.log.error_log.log(severity, msg)
-                else:
-                    cherrypy.log.error_log.log(severity, ' '.join((context, msg)))
-            cherrypy.log.error = syslog_error
-
-            # replacing the error handler by a syslog handler
-            handler = logging.handlers.SysLogHandler(address = '/dev/log', facility='user')
-            handler.setFormatter(syslog_formatter)
-            cherrypy.log.error_log.addHandler(handler)
-
-        elif config['global']['log.error_handler'] == 'file':
-            pass
-
-        # set log level
-        cherrypy.log.error_log.setLevel(level)
-        cherrypy.log.access_log.setLevel(level)
-
-        # preload templates
-        self.temp_lookup = lookup.TemplateLookup(
-                directories=self.template_dir, input_encoding='utf-8'
-                )
-        self.temp_index = self.temp_lookup.get_template('index.tmpl')
-        self.temp_result = self.temp_lookup.get_template('result.tmpl')
-        self.temp_error = self.temp_lookup.get_template('error.tmpl')
-        self.temp_login = self.temp_lookup.get_template('login.tmpl')
-
-        # loading the authentification module
-        auth = __import__(config['auth']['auth.module'], globals(), locals(), ['Auth'], -1)
-        self.auth = auth.Auth(config['auth'])
-            
-        # some static messages
-        self.sucess_message_add = """New record(s) successfully added!"""
-        self.sucess_message_del = """Record(s) successfully deleted!"""
-
-        # zones section parsing
-        self.zone_list = {}
-        self._parse_zones(config)
-
-
-
     def _select_algorithm(self, algo):
+        """ get the dns.tsig object corresponding the 
+        the tsig algorithme choosen
+        """
 
+        # case insensitive
         algo = algo.lower()
 
         if   algo == "hmac-md5":
@@ -177,6 +210,9 @@ class DnsCherry(object):
             return None
 
     def _parse_zones(self, config):
+        """dedicated parser for ['dns.zones'] section
+        in .ini file.
+        """
 
         # each entry in dns.zones is a zone parameters
         # format <key>.<zone> = '<value>'
@@ -205,7 +241,10 @@ class DnsCherry(object):
                 self.zone_list[zone] = { key : value } 
 
     def _validate_domain(self, domain):
-        if re.match('^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$', domain):
+        """ validate that a domain string really looks like a domain string
+        """
+        if re.match('^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$', 
+                domain):
             return True
         else:
             return False
@@ -275,6 +314,9 @@ class DnsCherry(object):
         raise exception
     
     def _error_handler(self, exception, zone=''):
+        """ exception handling function, takes an exception
+        and returns the right error page and emits a log
+        """
 
         # log the traceback as 'debug'
         cherrypy.log.error(
@@ -371,10 +413,14 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def signin(self):
+        """simple signin page
+        """
         return self.temp_login.render()
 
     @cherrypy.expose
     def login(self, login, password):
+        """login page
+        """
         if self.auth.check_credentials(login, password):
             message = "login success for user '%(user)s'" % {
                 'user': login
@@ -397,6 +443,8 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def logout(self):
+        """ logout page 
+        """
         user = self.auth.end_session()
         message = "user '%(user)s' logout" % {
             'user': user
@@ -410,6 +458,8 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def index(self, zone=None, **params):
+        """main page rendering
+        """
 
         user = 'unknown'
 
@@ -438,6 +488,8 @@ class DnsCherry(object):
 
     @cherrypy.expose
     def del_record(self, record=None, zone=None):
+        """delete records page
+        """
 
         user = 'unknown'
         user = self.auth.check_auth()
@@ -501,6 +553,8 @@ class DnsCherry(object):
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
             zone=None, content=None):
+        """ add record page
+        """
         
         user = 'unknown'
         user = self.auth.check_auth()
