@@ -13,8 +13,8 @@ Small cherrypy application to manage dns zone files
 
 ----
 
-:PyPI: Comming soon 
-:Doc: Comming soon 
+:PyPI: Coming soon 
+:Doc: Coming soon 
 :License: MIT
 :Author: Pierre-Francois Carpentier - copyright 2014
 
