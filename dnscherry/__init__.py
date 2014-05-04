@@ -280,8 +280,7 @@ class DnsCherry(object):
                     # filter by record type
                     if record['type'] in self.type_displayed:
                         records.append(record)
-        # return the list of records sorted by record type
-        return sorted(records, key=itemgetter('type'))  
+        return records
 
     def _manage_record(self, key=None, ttl=None, type=None,
             zone=None, content=None, action=None):
