@@ -16,9 +16,3 @@ class Auth(dnscherry.auth.Auth):
     def check_credentials(self, username, password):
         return self.ht.check_password(username, password)
 
-    def check_auth(self):
-        username = cherrypy.session.get(SESSION_KEY)
-        if username:
-           return username
-        else:
-           raise cherrypy.HTTPRedirect("/signin")

@@ -42,10 +42,3 @@ class Auth(dnscherry.auth.Auth):
         except ldap.SERVER_DOWN:
             raise cherrypy.HTTPError(
                 "500", "Ldap serveur unavailable")
-
-    def check_auth(self):
-        username = cherrypy.session.get(SESSION_KEY)
-        if username:
-           return username
-        else:
-           raise cherrypy.HTTPRedirect("/signin")
