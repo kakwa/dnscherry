@@ -164,8 +164,9 @@ class DnsCherry(object):
         self._parse_zones(config)
 
     def _get_loglevel(self, level):
-        """ transform a 'string' level into the
-        corresponding logging object
+        """ return logging level object
+        corresponding to a given level passed as
+        a string
         """
         if level == 'debug':
             return logging.DEBUG
@@ -283,6 +284,8 @@ class DnsCherry(object):
         return records
 
     def _manage_record(self, key=None, ttl=None, type=None,
+            """ add or delete a given record
+            """
             zone=None, content=None, action=None):
         
         keyring = dns.tsigkeyring.from_text({
@@ -310,6 +313,7 @@ class DnsCherry(object):
         response = dns.query.tcp(update, self.zone_list[zone]['ip'])
 
     def _reraise(self, exception):
+        """ reraise a given exception"""
         raise exception
     
     def _error_handler(self, exception, zone=''):
