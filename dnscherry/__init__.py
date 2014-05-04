@@ -284,9 +284,9 @@ class DnsCherry(object):
         return records
 
     def _manage_record(self, key=None, ttl=None, type=None,
-            """ add or delete a given record
-            """
             zone=None, content=None, action=None):
+        """ add or delete a given record
+        """
         
         keyring = dns.tsigkeyring.from_text({
             zone : self.zone_list[zone]['key']
