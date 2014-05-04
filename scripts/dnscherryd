@@ -104,7 +104,7 @@ if __name__ == '__main__':
         exit(1)
 
     if not os.path.isfile(options.config):
-        print('configuration file "'+ options.config + '" doesn\'t exsist' )
+        print('configuration file "'+ options.config + '" doesn\'t exist' )
         exit(1)
     
     start(options.config, options.daemonize,
