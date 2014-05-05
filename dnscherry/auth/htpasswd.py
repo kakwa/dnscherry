@@ -14,5 +14,11 @@ class Auth(dnscherry.auth.Auth):
         self.ht = HtpasswdFile(config ['auth.htpasswd.file'])
 
     def check_credentials(self, username, password):
-        return self.ht.check_password(username, password)
+        try:
+            return self.ht.check_password(username, password)
+        #older versions of passlib doesn't have check_password
+        except AttributeError:
+            username = str(username)
+            password = str(password)
+            return self.ht.verify(username, password)
 
