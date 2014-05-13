@@ -8,6 +8,9 @@ import cherrypy
 
 SESSION_KEY = '_cp_username'
 
+class MissingParameter(Exception):
+    pass
+
 class Auth(object):
 
     def __init__(self, config):
@@ -25,6 +28,20 @@ class Auth(object):
         @rtype: bool (True if authentificated, False otherwise)
         """
         return True
+
+    def _get_param(self, key, config, default=None):
+        """ Get configuration parameter "key" from config
+        @str key: the key to get
+        @dict config: the configuration (dictionnary)
+        @str default: the default value if parameter "key" is not present
+        @rtype: str (value of config['key'] if present default otherwith
+        """
+        if key in config:
+            return config[key]
+        if not default is None:
+            return default
+        else:
+            raise MissingParameter
 
     def end_session(self):
         """ remove the session from the session database

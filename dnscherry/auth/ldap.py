@@ -11,16 +11,17 @@ class Auth(dnscherry.auth.Auth):
 
     def __init__(self, config):
         self.logout_button = True
-        self.userdn = config['auth.ldap.userdn']
-        self.loginattribut = config['auth.ldap.loginattribut']
-        self.groupdn = config['auth.ldap.groupdn']
-        self.groupattribut = config['auth.ldap.groupattribut']
-        self.binddn = config['auth.ldap.binddn']
-        self.bindpassword = config['auth.ldap.bindpassword']
-        self.uri = config['auth.ldap.uri']
-        self.ca = config['auth.ldap.ca']
-        self.starttls = config['auth.ldap.starttls']
-        self.checkcert = config['auth.ldap.checkcert']
+        self.userdn = self._get_param('auth.ldap.userdn', config)
+        self.loginattribut = self._get_param('auth.ldap.loginattribut', config)
+        self.groupdn = self._get_param('auth.ldap.groupdn', config, False)
+        if self.groupdn:
+            self.groupattribut = self._get_param('auth.ldap.groupattribut', config, 'uniqueMember')
+        self.binddn = self._get_param('auth.ldap.binddn', config)
+        self.bindpassword = self._get_param('auth.ldap.bindpassword', config)
+        self.uri = self._get_param('auth.ldap.uri', config)
+        self.ca = self._get_param('auth.ldap.ca', config, False)
+        self.starttls = self._get_param('auth.ldap.starttls', config, 'off')
+        self.checkcert = self._get_param('auth.ldap.checkcert', config, 'on')
 
     def check_credentials(self, username, password):
         username = re.sub(',.*','', username)
