@@ -10,4 +10,4 @@ sudo sed -i "s%tools.staticdir.dir.*%tools.staticdir.dir = '`pwd`/resources/stat
 sudo chown -R openldap:openldap /etc/ldap/
 sudo /etc/init.d/slapd restart
 ldapadd -H ldap://localhost -x -D "cn=admin,dc=example,dc=org" -f /etc/ldap/content.ldif -w password
-sed -i "s/\(127.0.0.1.*\)/\1 ldap.dnscherry.org/"
+sed -i "s/\(127.0.0.1.*\)/\1 ldap.dnscherry.org/" /etc/hosts
