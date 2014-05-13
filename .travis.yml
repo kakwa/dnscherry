@@ -1,6 +1,7 @@
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install bind9
+  - sudo apt-get install ldap-utils
   - sudo  DEBIAN_FRONTEND=noninteractive apt-get install slapd -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  -f -q -y
 
 language: python
@@ -12,5 +13,7 @@ python:
 # command to install dependencies
 install: 
   - pip install -e . --use-mirrors
+  - pip install passlib
+  - pip install python-ldap
 # command to run tests
 script: "./run_test.sh"
