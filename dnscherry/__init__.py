@@ -39,121 +39,156 @@ class NoRecordSelected(Exception):
 class WrongDnsUpdateMethod(Exception):
     pass
 
+class MissingParameter(Exception):
+    def __init__(self, section, key):
+        self.section = section
+        self.key = key
+
 class DnsCherry(object):
+
+    def _get_param(self, section, key, config, default=None):
+        """ Get configuration parameter "key" from config
+        @str section: the section of the config file
+        @str key: the key to get
+        @dict config: the configuration (dictionnary)
+        @str default: the default value if parameter "key" is not present
+        @rtype: str (value of config['key'] if present default otherwith
+        """
+        if section in config and key in config[section]:
+            return config[section][key]
+        if not default is None:
+            return default
+        else:
+            raise MissingParameter(section, key)
 
     def reload(self, config = None):
         """ load/reload the configuration
         """
 
-        # definition of the template directory
-        self.template_dir = config['resources']['template_dir']
-        # configure the default zone (zone displayed by default)
-        self.zone_default = config['dns']['default.zone']
-        # configure the default ttl for the form
-        self.default_ttl = config['dns']['default.ttl']
-        # configure the list of dns entry type to display
-        self.type_displayed = re.split('\W+', 
-                    config['dns']['type.displayed']
+        try:
+            # definition of the template directory
+            # configure the default zone (zone displayed by default)
+            self.zone_default = self._get_param('dns', 'default.zone', config)
+            # configure the default ttl for the form
+            self.default_ttl = self._get_param('dns', 'default.ttl', config, '86400')
+            # configure the list of dns entry type to display
+            self.type_displayed = re.split('\W+', 
+                        self._get_param('dns', 'type.displayed', config, 'CNAME, A, AAAA')
+                    )
+            # configure the list of dns entry type a user can write
+            self.type_written = re.split('\W+',
+                        self._get_param('dns', 'type.written', config, 'CNAME, A, AAAA')
+                    )
+
+            # set if redirect on zone page after add or if
+            # display a summary of the added entries
+            if self._get_param('global', 'form.add.redirect', config, 'on') == 'on':
+                self.form_add_redirect = True
+            else:
+                self.form_add_redirect = False
+
+            # same for delete
+            if self._get_param('global', 'form.del.redirect', config, 'on') == 'on':
+                self.form_del_redirect = True
+            else:
+                self.form_del_redirect = False
+
+            # log configuration handling
+            # get log level 
+            # (if not in configuration file, log level is set to debug)
+            level = self._get_loglevel(self._get_param('global', 'log.level', config, 'debug'))
+
+            # log format for syslog
+            syslog_formatter = logging.Formatter(
+                    "dnscherry[%(process)d]: %(message)s")
+
+            access_handler = self._get_param('global', 'log.access_handler', config, 'syslog')
+
+            # replace access log handler by a syslog handler
+            if access_handler == 'syslog':
+                cherrypy.log.access_log.handlers = []
+                handler = logging.handlers.SysLogHandler(address = '/dev/log',
+                        facility='user')
+                handler.setFormatter(syslog_formatter)
+                cherrypy.log.access_log.addHandler(handler)
+
+            # if file, we keep the default
+            elif access_handler == 'file':
+                pass
+
+            # replace access log handler by a null handler
+            elif access_handler == 'none':
+                cherrypy.log.access_log.handlers = []
+                handler = logging.NullHandler()
+                cherrypy.log.access_log.addHandler(handler)
+
+            error_handler = self._get_param('global', 'log.error_handler', config, 'syslog')
+
+            # replacing the error handler by a syslog handler
+            if error_handler == 'syslog':
+                cherrypy.log.error_log.handlers = []
+
+                # redefining log.error method because cherrypy does weird
+                # things like adding the date inside the message 
+                # or adding space even if context is empty 
+                # (by the way, what's the use of "context"?)
+                def syslog_error(msg='', context='', 
+                        severity=logging.INFO, traceback=False):
+                    if traceback:
+                        msg += cherrypy._cperror.format_exc()
+                    if context == '':
+                        cherrypy.log.error_log.log(severity, msg)
+                    else:
+                        cherrypy.log.error_log.log(severity, 
+                                ' '.join((context, msg)))
+                cherrypy.log.error = syslog_error
+
+                handler = logging.handlers.SysLogHandler(address = '/dev/log',
+                        facility='user')
+                handler.setFormatter(syslog_formatter)
+                cherrypy.log.error_log.addHandler(handler)
+
+            # if file, we keep the default
+            elif error_handler == 'file':
+                pass
+
+            # replacing the error handler by a null handler
+            elif error_handler == 'none':
+                cherrypy.log.error_log.handlers = []
+                handler = logging.NullHandler()
+                cherrypy.log.error_log.addHandler(handler)
+
+            # set log level
+            cherrypy.log.error_log.setLevel(level)
+            cherrypy.log.access_log.setLevel(level)
+
+            # preload templates
+            self.temp_lookup = lookup.TemplateLookup(
+                    directories=self.template_dir, input_encoding='utf-8'
+                    )
+            self.temp_index = self.temp_lookup.get_template('index.tmpl')
+            self.temp_result = self.temp_lookup.get_template('result.tmpl')
+            self.temp_error = self.temp_lookup.get_template('error.tmpl')
+            self.temp_login = self.temp_lookup.get_template('login.tmpl')
+
+            # loading the authentification module
+            auth_module = self._get_param('auth', 'auth.module', config)
+            auth = __import__(auth_module, globals(), locals(), ['Auth'], -1)
+            self.auth = auth.Auth(config['auth'])
+
+        except MissingParameter as e:
+            cherrypy.log.error(
+                msg = "dnscherry failure, "\
+                    "missing parameter '%(param)s' "\
+                    "in section '%(section)s'" % {
+                        'param': e.key,
+                        'section': e.section
+                    },
+                severity = logging.ERROR
                 )
-        # configure the list of dns entry type a user can write
-        self.type_written = re.split('\W+',
-                    config['dns']['type.written']
-                )
+            exit(1)
 
-        # set if redirect on zone page after add or if
-        # display a summary of the added entries
-        if config['global']['form.add.redirect'] == 'on':
-            self.form_add_redirect = True
-        else:
-            self.form_add_redirect = False
 
-        # same for delete
-        if config['global']['form.del.redirect'] == 'on':
-            self.form_del_redirect = True
-        else:
-            self.form_del_redirect = False
-
-        # log configuration handling
-        # get log level 
-        # (if not in configuration file, log level is set to debug)
-        if 'log.level' in config['global']:
-            level = self._get_loglevel(config['global']['log.level'])
-        else: 
-            level = self._get_loglevel('debug')
-
-        # log format for syslog
-        syslog_formatter = logging.Formatter(
-                "dnscherry[%(process)d]: %(message)s")
-
-        # replace access log handler by a syslog handler
-        if   config['global']['log.access_handler'] == 'syslog':
-            cherrypy.log.access_log.handlers = []
-            handler = logging.handlers.SysLogHandler(address = '/dev/log',
-                    facility='user')
-            handler.setFormatter(syslog_formatter)
-            cherrypy.log.access_log.addHandler(handler)
-
-        # if file, we keep the default
-        elif config['global']['log.access_handler'] == 'file':
-            pass
-
-        # replace access log handler by a null handler
-        elif config['global']['log.access_handler'] == 'none':
-            cherrypy.log.access_log.handlers = []
-            handler = logging.NullHandler()
-            cherrypy.log.access_log.addHandler(handler)
-
-        # replacing the error handler by a syslog handler
-        if   config['global']['log.error_handler'] == 'syslog':
-            cherrypy.log.error_log.handlers = []
-
-            # redefining log.error method because cherrypy does weird
-            # things like adding the date inside the message 
-            # or adding space even if context is empty 
-            # (by the way, what's the use of "context"?)
-            def syslog_error(msg='', context='', 
-                    severity=logging.INFO, traceback=False):
-                if traceback:
-                    msg += cherrypy._cperror.format_exc()
-                if context == '':
-                    cherrypy.log.error_log.log(severity, msg)
-                else:
-                    cherrypy.log.error_log.log(severity, 
-                            ' '.join((context, msg)))
-            cherrypy.log.error = syslog_error
-
-            handler = logging.handlers.SysLogHandler(address = '/dev/log',
-                    facility='user')
-            handler.setFormatter(syslog_formatter)
-            cherrypy.log.error_log.addHandler(handler)
-
-        # if file, we keep the default
-        elif config['global']['log.error_handler'] == 'file':
-            pass
-
-        # replacing the error handler by a null handler
-        elif config['global']['log.error_handler'] == 'none':
-            cherrypy.log.error_log.handlers = []
-            handler = logging.NullHandler()
-            cherrypy.log.error_log.addHandler(handler)
-
-        # set log level
-        cherrypy.log.error_log.setLevel(level)
-        cherrypy.log.access_log.setLevel(level)
-
-        # preload templates
-        self.temp_lookup = lookup.TemplateLookup(
-                directories=self.template_dir, input_encoding='utf-8'
-                )
-        self.temp_index = self.temp_lookup.get_template('index.tmpl')
-        self.temp_result = self.temp_lookup.get_template('result.tmpl')
-        self.temp_error = self.temp_lookup.get_template('error.tmpl')
-        self.temp_login = self.temp_lookup.get_template('login.tmpl')
-
-        # loading the authentification module
-        auth = __import__(config['auth']['auth.module'],
-                globals(), locals(), ['Auth'], -1)
-        self.auth = auth.Auth(config['auth'])
             
         # some static messages
         self.sucess_message_add = """New record(s) successfully added!"""

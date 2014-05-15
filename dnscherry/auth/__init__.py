@@ -5,11 +5,9 @@
 # Session tool to be loaded.
 
 import cherrypy
+import dnscherry
 
 SESSION_KEY = '_cp_username'
-
-class MissingParameter(Exception):
-    pass
 
 class Auth(object):
 
@@ -41,7 +39,7 @@ class Auth(object):
         if not default is None:
             return default
         else:
-            raise MissingParameter
+            raise dnscherry.MissingParameter('auth', key)
 
     def end_session(self):
         """ remove the session from the session database
