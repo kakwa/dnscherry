@@ -71,6 +71,7 @@ class DnsCherry(object):
 
         try:
             # definition of the template directory
+            self.template_dir = self._get_param('resources', 'template_dir', config)
             # configure the default zone (zone displayed by default)
             self.zone_default = self._get_param('dns', 'default.zone', config)
             # configure the default ttl for the form
