@@ -16,10 +16,12 @@ class Auth(dnscherry.auth.Auth):
     def __init__(self, config):
         self.logout_button = True
         self.userdn = self._get_param('auth.ldap.userdn', config)
-        self.loginattribut = self._get_param('auth.ldap.loginattribut', config)
+        self.user_filter_tmpl = self._get_param('auth.ldap.user.filter.tmpl', config)
         self.groupdn = self._get_param('auth.ldap.groupdn', config, False)
+
         if self.groupdn:
-            self.groupattribut = self._get_param('auth.ldap.groupattribut', config, 'uniqueMember')
+            self.user_group_tmpl = self._get_param('auth.ldap.group.filter.tmpl', config)
+
         self.binddn = self._get_param('auth.ldap.binddn', config)
         self.bindpassword = self._get_param('auth.ldap.bindpassword', config)
         self.uri = self._get_param('auth.ldap.uri', config)
