@@ -20,7 +20,7 @@ class Auth(dnscherry.auth.Auth):
         self.groupdn = self._get_param('auth.ldap.groupdn', config, False)
 
         if self.groupdn:
-            self.user_group_tmpl = self._get_param('auth.ldap.group.filter.tmpl', config)
+            self.group_filter_tmpl = self._get_param('auth.ldap.group.filter.tmpl', config)
 
         self.binddn = self._get_param('auth.ldap.binddn', config)
         self.bindpassword = self._get_param('auth.ldap.bindpassword', config)
@@ -30,8 +30,19 @@ class Auth(dnscherry.auth.Auth):
         self.checkcert = self._get_param('auth.ldap.checkcert', config, 'on')
 
     def check_credentials(self, username, password):
+
         ldap_client = ldap.initialize(self.uri)
         ldap_client.set_option(ldap.OPT_REFERRALS, 0)
+
+        if self.starttls == 'on':
+            ldap_client.set_option(ldap.OPT_X_TLS_HARD, True)
+        if self.ca:
+            ldap_client.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
+        if self.checkcert == 'off':
+            ldap_client.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+        if self.starttls == 'on':
+            ldap_client.start_tls_s()
+
         ldap_client.simple_bind_s(self.binddn, self.bindpassword)
         user_filter = self.user_filter_tmpl % {
             'login': username
@@ -49,8 +60,27 @@ class Auth(dnscherry.auth.Auth):
         try:
             ldap_auth = ldap.initialize(self.uri)
             ldap_auth.set_option(ldap.OPT_REFERRALS, 0)
+            if self.starttls == 'on':
+                ldap_auth.set_option(ldap.OPT_X_TLS_HARD, True)
+            if self.ca:
+                ldap_auth.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
+            if self.checkcert == 'off':
+                ldap_auth.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+
+
             ldap_auth.simple_bind_s(dn_entry, password)
+            ldap_auth.unbind_s()
         except ldap.INVALID_CREDENTIALS:
             return False
+        if self.groupdn:
+            group_filter = self.group_filter_tmpl % {
+                    'userdn': dn_entry
+                    }
+            r = ldap_client.search_s(self.groupdn, 
+                ldap.SCOPE_SUBTREE,
+                group_filter
+                )
+            if len(r) == 0:
+                return False
 
         return True
