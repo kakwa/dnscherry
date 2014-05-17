@@ -13,7 +13,7 @@ SESSION_KEY = '_cp_username'
 
 class Auth(dnscherry.auth.Auth):
 
-    def __init__(self, config):
+    def __init__(self, config, logger=None):
         self.logout_button = True
         self.htpasswdfile = self._get_param('auth.htpasswd.file', config, None)
         self.ht = HtpasswdFile(self.htpasswdfile)

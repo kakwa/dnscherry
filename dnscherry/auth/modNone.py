@@ -10,7 +10,7 @@ import dnscherry.auth
 
 class Auth(dnscherry.auth.Auth):
 
-    def __init__(self, config):
+    def __init__(self, config, logger=None):
         # no need for a logout button
         self.logout_button = False
         if 'auth.user_header_name' in config:

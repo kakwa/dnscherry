@@ -11,12 +11,13 @@ SESSION_KEY = '_cp_username'
 
 class Auth(object):
 
-    def __init__(self, config):
+    def __init__(self, config, logger=None):
         """ module initialization
         initialize the auth module
         the 'auth' section of the ini file is passed by 'config'
         @hash config: the 'auth' section of the ini file
         """
+        self.logger = logger
         pass
 
     def check_credentials(self, username, password):
@@ -40,6 +41,14 @@ class Auth(object):
             return default
         else:
             raise dnscherry.MissingParameter('auth', key)
+
+    def _logger(self, severity, message):
+        if self.logger:
+            self.logger.error(
+                msg = message,
+                severity = severity
+                )
+
 
     def end_session(self):
         """ remove the session from the session database

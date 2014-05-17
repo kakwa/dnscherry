@@ -8,12 +8,15 @@
 import cherrypy
 import ldap
 import dnscherry.auth
+import logging
 
 SESSION_KEY = '_cp_username'
 
 class Auth(dnscherry.auth.Auth):
 
-    def __init__(self, config):
+    def __init__(self, config, logger=None):
+
+        self.logger = logger
         self.logout_button = True
         self.userdn = self._get_param('auth.ldap.userdn', config)
         self.user_filter_tmpl = self._get_param('auth.ldap.user.filter.tmpl', config)
@@ -44,9 +47,29 @@ class Auth(dnscherry.auth.Auth):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,ldap.OPT_X_TLS_DEMAND)
 
         if self.starttls == 'on':
-            ldap_client.start_tls_s()
+            try:
+                ldap_client.start_tls_s()
+            except ldap.OPERATIONS_ERROR:
+                self._logger(
+                    logging.ERROR,
+                    "cannot use starttls with ldaps:// uri (uri: " + self.uri + ")"
+                )
+                raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+        try:
+            ldap_client.simple_bind_s(self.binddn, self.bindpassword)
+        except ldap.INVALID_CREDENTIALS:
+            self._logger(
+                    logging.ERROR,
+                    "Configuration error, wrong credentials, unable to connect to ldap with '" + self.binddn + "'"
+                )
+            raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+        except ldap.SERVER_DOWN:
+            self._logger(
+                    logging.ERROR,
+                    "Unable to contact ldap server '" + self.uri + "', check 'auth.ldap.uri' and ssl/tls configuration" 
+                )
+            return False
 
-        ldap_client.simple_bind_s(self.binddn, self.bindpassword)
         user_filter = self.user_filter_tmpl % {
             'login': username
             }

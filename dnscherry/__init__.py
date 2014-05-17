@@ -179,7 +179,7 @@ class DnsCherry(object):
             # loading the authentification module
             auth_module = self._get_param('auth', 'auth.module', config)
             auth = __import__(auth_module, globals(), locals(), ['Auth'], -1)
-            self.auth = auth.Auth(config['auth'])
+            self.auth = auth.Auth(config['auth'], cherrypy.log)
 
         except MissingParameter as e:
             cherrypy.log.error(
