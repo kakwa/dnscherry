@@ -35,11 +35,14 @@ class Auth(dnscherry.auth.Auth):
         ldap_client.set_option(ldap.OPT_REFERRALS, 0)
 
         if self.starttls == 'on':
-            ldap_client.set_option(ldap.OPT_X_TLS_HARD, True)
+            ldap.set_option(ldap.OPT_X_TLS_DEMAND, True)
         if self.ca:
-            ldap_client.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
+            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
         if self.checkcert == 'off':
-            ldap_client.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+        else: 
+            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,ldap.OPT_X_TLS_DEMAND)
+
         if self.starttls == 'on':
             ldap_client.start_tls_s()
 
@@ -53,25 +56,22 @@ class Auth(dnscherry.auth.Auth):
                 user_filter
                  )
         if len(r) == 0:
+            ldap_client.unbind_s()
             return False
 
         dn_entry = r[0][0]
 
         try:
             ldap_auth = ldap.initialize(self.uri)
-            ldap_auth.set_option(ldap.OPT_REFERRALS, 0)
             if self.starttls == 'on':
-                ldap_auth.set_option(ldap.OPT_X_TLS_HARD, True)
-            if self.ca:
-                ldap_auth.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
-            if self.checkcert == 'off':
-                ldap_auth.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
-
-
+                ldap_auth.start_tls_s()
+            ldap_auth.set_option(ldap.OPT_REFERRALS, 0)
             ldap_auth.simple_bind_s(dn_entry, password)
             ldap_auth.unbind_s()
         except ldap.INVALID_CREDENTIALS:
+            ldap_client.unbind_s()
             return False
+
         if self.groupdn:
             group_filter = self.group_filter_tmpl % {
                     'userdn': dn_entry
@@ -81,6 +81,8 @@ class Auth(dnscherry.auth.Auth):
                 group_filter
                 )
             if len(r) == 0:
+                ldap_client.unbind_s()
                 return False
 
+        ldap_client.unbind_s()
         return True
