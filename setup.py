@@ -100,8 +100,7 @@ setup(
     tests_require    = ['pytest'],
     extras_require   = {
             'auth_htpasswd' : ['passlib'],
-            'auth_ldap' : ['python-ldap'],
-            'fastcgi' : ['flup']
+            'auth_ldap' : ['python-ldap']
         },
     cmdclass         = {'test': PyTest},
     classifiers      = [
