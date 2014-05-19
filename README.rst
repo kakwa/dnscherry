@@ -32,7 +32,7 @@ dynamic updates.
 Screenshots
 ===========
 
-.. image:: https://raw.githubusercontent.com/kakwa/dnscherry/master/docs/images/main_screen.png
+.. image:: https://raw.githubusercontent.com/kakwa/dnscherry/master/docs/assets/main_screen.png
 
 License
 =======
