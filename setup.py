@@ -6,6 +6,7 @@ import os
 import re
 import sys
 from distutils.core import setup
+import dnscherry
 
 #some install path variables
 sysconfdir = os.getenv("SYSCONFDIR", "/etc")
@@ -86,7 +87,7 @@ resources_files.append((
 setup(
     name             = 'dnscherry',
     zip_safe         = False,
-    version          = '0.0.0',
+    version          = dnscherry.__version__,
     author           = 'Pierre-Francois Carpentier',
     author_email     = 'carpentier.pf@gmail.com',
     packages         = ['dnscherry', 'dnscherry.auth'],

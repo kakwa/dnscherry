@@ -34,6 +34,8 @@ from cherrypy.lib.httputil import parse_query_string
 from mako.template import Template
 from mako import lookup
 
+__version__ = '0.0.1'
+
 SESSION_KEY = '_cp_username'
 
 # some custom exceptions
