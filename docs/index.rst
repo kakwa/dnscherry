@@ -1,17 +1,13 @@
-======================================================
-    DnsCherry | Dns zones management wed interface
-======================================================
-
-|
-
-.. image:: assets/banner.png
+===============
+  DnsCherry 
+===============
 
 ----
 
-:Dev: `dnscherry source <https://github.com/kakwa/dnscherry>`_
+:Dev: `dnscherry git <https://github.com/kakwa/dnscherry>`_
 :PyPI: `dnscherry package <http://pypi.python.org/pypi/dnscherry>`_
 :License: MIT
-:Author: Pierre-Francois Carpentier - copyright |copy| 2014
+:Author: Pierre-Francois Carpentier - copyright © 2014
 
 ----
 
@@ -23,13 +19,20 @@ Tsig hmac mechanizisms.
 DnsCherry supports access controle via htpasswd files, ldap, http header, 
 or any other authentification mechanizisms you can implement.
 
-DnsCherry also provides logging of each connexion and modification threw 
+DnsCherry provides logging of each connexion and modification through 
 syslog or directly to log files.
 
-DnsCherry aims to be simple a simple to deploy and simple to use dns web interface.
+DnsCherry aims to be a simple to deploy and to use dns web interface.
+
+**************
+  Screenshot
+**************
+
+.. image:: assets/main_screen.png
+    :width: 600 px
 
 *************
-    Site Menu
+  Site Menu
 *************
 
 .. toctree::
@@ -41,7 +44,7 @@ DnsCherry aims to be simple a simple to deploy and simple to use dns web interfa
     changelog
 
 *******************************
-    Discussion / Help / Updates
+  Discussion / Help / Updates
 *******************************
 
 * IRC: `Freenode <http://freenode.net/>`_ ``#dnscherry`` channel
@@ -50,3 +53,4 @@ DnsCherry aims to be simple a simple to deploy and simple to use dns web interfa
 ----
 
 .. image:: assets/python-powered.png
+.. image:: assets/cherrypy.png

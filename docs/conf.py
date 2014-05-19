@@ -103,7 +103,7 @@ html_theme = 'nature'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'DnsCherry v%s Docs' % release
+html_title = 'DnsCherry %s Docs' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 
