@@ -14,7 +14,7 @@ Small cherrypy application to manage dns zone files
 ----
 
 :PyPI: Coming soon 
-:Doc: Coming soon 
+:Doc: `Documentation <http://dnscherry.readthedocs.org>`_
 :License: MIT
 :Author: Pierre-Francois Carpentier - copyright 2014
 
