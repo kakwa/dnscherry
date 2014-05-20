@@ -1,6 +1,6 @@
-===============
+==============
   DnsCherry 
-===============
+==============
 
 ----
 
@@ -10,26 +10,6 @@
 :Author: Pierre-Francois Carpentier - copyright © 2014
 
 ----
-
-DnsCherry is a simple cherrypy application to manage dns zones.
-
-It permits to add/delete records in one or several zones using 
-Tsig hmac mechanizisms.
-
-DnsCherry supports access controle via htpasswd files, ldap, http header, 
-or any other authentification mechanizisms you can implement.
-
-DnsCherry provides logging of each connexion and modification through 
-syslog or directly to log files.
-
-DnsCherry aims to be a simple to deploy and to use dns web interface.
-
-**************
-  Screenshot
-**************
-
-.. image:: assets/main_screen.png
-    :width: 600 px
 
 *************
   Site Menu
@@ -42,6 +22,27 @@ DnsCherry aims to be a simple to deploy and to use dns web interface.
     deploy
     auth_module
     changelog
+
+****************
+  Presentation
+****************
+
+DnsCherry is a simple cherrypy application managing dns zones.
+It's main functionalities are:
+
+* add or delete records in one or several zones (using Tsig HMAC mechanizisms)
+* access control with htpasswd files, ldap, http header (use it behind a SSO)
+* modular auth mechanizim, custom auth modules can easily be implemented
+* traces for each action (add/delete record, connexions...) through logs (syslog or files)
+
+DnsCherry aims to be a simple to deploy and to use dns web interface.
+
+**************
+  Screenshot
+**************
+
+.. image:: assets/main_screen.png
+    :width: 600 px
 
 *******************************
   Discussion / Help / Updates
