@@ -183,6 +183,7 @@ div.admonition p.admonition-title + p {
 
 div.highlight{
     background-color: white;
+    font-size: 80%;
 }
 
 div.note {
