@@ -29,15 +29,16 @@ Dns management web interface.
   Presentation
 ****************
 
-DnsCherry is a simple cherrypy application managing dns zones.
+DnsCherry is cherrypy application to manage dns zones.
+
 It's main functionalities are:
 
-* add or delete records in one or several zones (using Tsig HMAC mechanizisms)
+* add or delete records in one or several zones (using Tsig HMAC)
 * access control with htpasswd files, ldap, http header (use it behind a SSO)
-* modular auth mechanizim, custom auth modules can easily be implemented
+* modular auth mechanisms, custom authentication modules can easily be implemented
 * traces for each action (add/delete record, connexions...) through logs (syslog or files)
 
-DnsCherry aims to be a simple to deploy and to use dns web interface.
+DnsCherry aims to be a simple to deploy and to use Dns web interface.
 
 **************
   Screenshot

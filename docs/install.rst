@@ -31,8 +31,8 @@ Installed files
 DnsCherry install directories are:
 
 * **/etc/dnscherry/** (configuration)
-* **dist-package** or **site-packages** of your distribution (dnscherry modules)
-* **/usr/share/dnscherry/** (static content (css, js, images) and templates)
+* **dist-package** or **site-packages** of your distribution (DnsCherry modules)
+* **/usr/share/dnscherry/** (static content (css, js, images...) and templates)
 
 These directories can be changed by exporting the following variables before launching the install command:
 

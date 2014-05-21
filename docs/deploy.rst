@@ -58,7 +58,7 @@ To create a tsig key, use the following commands:
    Publish: 20140521080238
    Activate: 20140521080238
 
-The important field for us is **Key**, it's this field which will be used in the dns server and dnscherry.
+The important field for us is **Key**, it's this field which will be used in the dns server and DnsCherry.
 
 Bind server tsig configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,7 +85,7 @@ Configure bind server to use this key:
 DnsCherry configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Configure the zone in dnscherry:
+Configure the zone in DnsCherry:
 
 .. sourcecode:: ini
 
@@ -121,7 +121,7 @@ example:
 Other dns parameters
 ~~~~~~~~~~~~~~~~~~~~
 
-DnsCherry has other dns paramters which must be provided:
+DnsCherry has other dns parameters which must be provided:
 
 .. sourcecode:: ini
 
@@ -152,7 +152,7 @@ Logs
 ----
 
 DnsCherry has two loggers, one for errors and actions (login, del/add, logout...) and one for access logs.
-Each logger can be configured to log to syslog, file or be desactivated. 
+Each logger can be configured to log to syslog, file or be unactivated. 
 
 .. warning::
 
