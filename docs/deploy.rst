@@ -184,8 +184,6 @@ File configuration:
     # error and dnscherry log file
     log.error_file = '/tmp/dnscherry_error.log'
 
-
-
 Disable logs:
 
 .. sourcecode:: ini
@@ -256,14 +254,49 @@ Other DnsCherry parameters
 WebServer
 ---------
 
+Idealy, DnsCherry must be deployed behind a proper http server like nginx or apache.
+
+The webserver must be configured to act as a reverse (ssl) proxy to a DnsCherry instance listening on localhost (127.0.0.1).
+
 Cherrypy
 ~~~~~~~~
 
+Cherrypy has an embeded web sever which can be used for testing.
+
+It has some severe limitations:
+
+* no SSL/TLS (which is recommanded)
+* no listening on the standard http port 80
+
+To make DnsCherry listens on every IP:
+
+.. sourcecode:: ini
+
+    [global]
+    
+    # listing interface
+    server.socket_host = '0.0.0.0'
+    # port
+    server.socket_port = 8080
+ 
 Nginx
 ~~~~~
 
+.. literalinclude:: ../goodies/nginx.conf
+   :language: none
+
+
 Apache
 ~~~~~~
+
+.. literalinclude:: ../goodies/apache.conf
+   :language: none
+
+Lighttpd
+~~~~~~~~
+
+.. literalinclude:: ../goodies/lighttpd.conf
+   :language: none
 
 Init Script
 -----------
