@@ -72,6 +72,10 @@ case "$1" in
     ;;
   restart)
     stop_dnscherryd 
+    while pidofproc -p $PIDFILE $BIN >/dev/null
+    do
+        sleep 0.5
+    done
     start_dnscherryd
     exit $?
     ;;
