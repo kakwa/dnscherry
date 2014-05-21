@@ -206,6 +206,53 @@ Set log level:
     # log level
     log.level = 'info'
 
+Other DnsCherry parameters
+--------------------------
+
+.. sourcecode:: ini
+
+    [global]
+    
+    # listing interface
+    server.socket_host = '127.0.0.1'
+    # port
+    server.socket_port = 8080
+    # number of threads
+    server.thread_pool = 8
+    #don't show traceback on error
+    request.show_tracebacks = False
+    
+    #####################################
+    #        Form configuration         #
+    #####################################
+    # redirect to zone page after adding/deleting a record
+    # if 'on', redirects to zone page
+    # if 'off', stays on a summary page
+    form.add.redirect = 'on'
+    form.del.redirect = 'on'
+    
+    # session configuration
+    # activate session
+    tools.sessions.on = True
+    # session timeout
+    tools.sessions.timeout = 10
+    # file session storage(to use if multiple processes, 
+    # default is in RAM and per process)
+    #tools.sessions.storage_type = "file"
+    # session 
+    #tools.sessions.storage_path = "/var/lib/dnscherry/sessions"
+    
+    # resources parameters
+    [resources]
+    # templates directory
+    template_dir = '/usr/share/dnscherry/templates/'
+    
+    # enable cherrypy static handling
+    # to comment if static content are handled otherwise
+    [/static]
+    tools.staticdir.on = True
+    tools.staticdir.dir = '/usr/share/dnscherry/static/'
+
 WebServer
 ---------
 
