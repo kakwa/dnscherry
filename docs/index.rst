@@ -2,6 +2,8 @@
   DnsCherry 
 ==============
 
+Dns management web interface.
+
 ----
 
 :Dev: `dnscherry git <https://github.com/kakwa/dnscherry>`_
