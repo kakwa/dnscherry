@@ -16,9 +16,9 @@ class Auth(object):
         initialize the auth module
         the 'auth' section of the ini file is passed by 'config'
         @hash config: the 'auth' section of the ini file
+        @logger logger: the dnscherry error logger
         """
         self.logger = logger
-        pass
 
     def check_credentials(self, username, password):
         """ Check credential function (called on login)
