@@ -45,7 +45,7 @@ Quick installation guide:
 
 .. sourcecode:: bash
 
-    $ python setup.py install
+    $ pip install dnscherry
     
     # edit configuration according to your dns setup
     $ vim /etc/dnscherry/dnscherry.ini
