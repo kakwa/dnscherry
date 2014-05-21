@@ -117,7 +117,7 @@ and implement the **__init__** and **check_credentials** methods:
 
             # get param2, with no default value 
             # if not provided in the 'auth' section, DnsCherry will emit 
-            # a log telling that the parameter is missing, then exit(1)
+            # a log telling that the parameter is missing and exit(1)
             self.param2 = self._get_param('auth.mymod.param2')
             
             # emit a custom log 
@@ -135,6 +135,6 @@ and implement the **__init__** and **check_credentials** methods:
             """
             
             # simple module checking only one user/password
-            return username == 'george' && password == 'password'
+            return username == 'george' and password == 'password'
 
 
