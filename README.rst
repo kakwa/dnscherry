@@ -7,13 +7,13 @@ Small cherrypy application to manage dns zone files
     :target: http://travis-ci.org/kakwa/dnscherry
     :alt: Travis CI
 
-.. .. image:: https://pypip.in/d/dnscherry/badge.png
-..    :target: https://pypi.python.org/pypi/dnscherry
-..    :alt: Number of PyPI downloads
+ .. image:: https://pypip.in/d/dnscherry/badge.png
+    :target: https://pypi.python.org/pypi/dnscherry
+    :alt: Number of PyPI downloads
 
 ----
 
-:PyPI: Coming soon 
+:PyPI: `Package <https://pypi.python.org/pypi/dnscherry>`_
 :Doc: `Documentation <http://dnscherry.readthedocs.org>`_
 :License: MIT
 :Author: Pierre-Francois Carpentier - copyright 2014
@@ -27,7 +27,6 @@ Dnscherry is a small cherrypy application to manage dns zones.
 It can add/delete records from any dns server using tsig and
 dynamic updates.
 
-**It's still a work in progress.**
 
 Screenshots
 ===========
@@ -54,4 +53,4 @@ Quick installation guide:
     # launch dnscherryd
     dnscherryd -c /etc/dnscherry/dnscherry.ini
 
-Now, it should be accessible from your browser.
+It should be accessible from your browser on http://localhost:8080.
