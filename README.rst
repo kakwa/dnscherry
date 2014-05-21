@@ -7,7 +7,7 @@ Small cherrypy application to manage dns zone files
     :target: http://travis-ci.org/kakwa/dnscherry
     :alt: Travis CI
 
- .. image:: https://pypip.in/d/dnscherry/badge.png
+.. image:: https://pypip.in/d/dnscherry/badge.png
     :target: https://pypi.python.org/pypi/dnscherry
     :alt: Number of PyPI downloads
 
