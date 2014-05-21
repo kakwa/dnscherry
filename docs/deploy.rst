@@ -148,6 +148,64 @@ DnsCherry supports the following algorithms:
 * hmac-sha384
 * hmac-sha512
 
+Logs
+----
+
+DnsCherry has two loggers, one for errors and actions (login, del/add, logout...) and one for access logs.
+Each logger can be configured to log to syslog, file or be desactivated. 
+
+.. warning::
+
+    you can't set a logger to log both in file and syslog
+
+Syslog configuration:
+
+.. sourcecode:: ini
+
+    [global]
+
+    # logger syslog for access log 
+    log.access_handler = 'syslog'
+    # logger syslog for error and dnscherry log 
+    log.error_handler = 'syslog'
+
+File configuration:
+
+.. sourcecode:: ini
+
+    [global]
+
+    # logger syslog for access log 
+    log.access_handler = 'file'
+    # logger syslog for error and dnscherry log 
+    log.error_handler = 'file'
+    # access log file
+    log.access_file = '/tmp/dnscherry_access.log'
+    # error and dnscherry log file
+    log.error_file = '/tmp/dnscherry_error.log'
+
+
+
+Disable logs:
+
+.. sourcecode:: ini
+
+    [global]
+
+    # logger syslog for access log 
+    log.access_handler = 'none'
+    # logger syslog for error and dnscherry log 
+    log.error_handler = 'none'
+
+Set log level:
+
+.. sourcecode:: ini
+
+    [global]
+
+    # log level
+    log.level = 'info'
+
 WebServer
 ---------
 
@@ -160,9 +218,6 @@ Nginx
 Apache
 ~~~~~~
 
-Logs
-----
-
 Init Script
 -----------
 
@@ -173,9 +228,9 @@ Sample init script for Debian:
 
 This init script is available in **goodies/init-debian**.
 
-Sample DnsCherry Configuration
+DnsCherry configuration file
+----------------------------
 
 .. literalinclude:: ../conf/dnscherry.ini
    :language: ini
-
 
