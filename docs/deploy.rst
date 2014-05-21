@@ -118,6 +118,18 @@ example:
     algorithm.mydomain.org = 'hmac-md5'
     key.mydomain.org = 'oWko9caaaafdeZosUzScZ5VStLA=='
 
+Supported algorithms
+~~~~~~~~~~~~~~~~~~~~
+
+DnsCherry supports the following algorithms:
+
+* hmac-md5
+* hmac-sha1
+* hmac-sha224
+* hmac-sha256
+* hmac-sha384
+* hmac-sha512
+
 Other dns parameters
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -135,18 +147,6 @@ DnsCherry has other dns parameters which must be provided:
     type.written = 'A, AAAA, CNAME, MX'
     # default ttl for new records
     default.ttl = '3600'
-
-Supported algorithms
-~~~~~~~~~~~~~~~~~~~~
-
-DnsCherry supports the following algorithms:
-
-* hmac-md5
-* hmac-sha1
-* hmac-sha224
-* hmac-sha256
-* hmac-sha384
-* hmac-sha512
 
 Logs
 ----
