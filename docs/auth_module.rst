@@ -7,7 +7,7 @@ Configuration
 modNone
 ~~~~~~~
 
-This module is used if no authentification is needed, for example, with a Single Sign On in front of DnsCherry.
+This module is used if no authentication is needed, for example, with a Single Sign On in front of DnsCherry.
 
 However, in order to trace who made which action, the user name can be provided in an http header, 
 in that case, having the http header in each request is mandatory.
@@ -47,15 +47,15 @@ Configuration:
 modLdap
 ~~~~~~~
 
-This module authentificates users against an ldap server.
+This module authenticates users against an ldap server.
 
 .. warning::
 
-    This module requires installing **python-ldap**, 
+    This module requires installing **python-ldap**.
 
 .. warning::
 
-    As python-ldap is not compatible with python 3.x, DnsCherry must be launched with python 2.7.
+    As **python-ldap** is **not compatible with python 3.x**, DnsCherry must be launched with **python 2.7** if this module is used.
 
 Configuration:
 
@@ -112,6 +112,10 @@ and implement the **__init__** and **check_credentials** methods:
             """
             self.logger = logger
             
+            # set to True if you want the logout button to be displayed
+            # set to False to hide it
+            self.logout_button = False
+
             # get param1, with default value 'hello'
             self.param1 = self._get_param('auth.mymod.param1', 'hello')
 
@@ -126,7 +130,6 @@ and implement the **__init__** and **check_credentials** methods:
                  'my module is initialized'
             )
 
-    
         def check_credentials(self, username, password):
             """ Check credential function (called on login)
             @str username: the login to check
@@ -136,5 +139,4 @@ and implement the **__init__** and **check_credentials** methods:
             
             # simple module checking only one user/password
             return username == 'george' and password == 'password'
-
 
