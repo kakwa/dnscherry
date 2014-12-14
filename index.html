@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dnscherry by kakwa</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Dnscherry</h1>
+        <p class="header">Small cherrypy application to manage dns zones.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/kakwa/dnscherry/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/kakwa/dnscherry/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/kakwa/dnscherry">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/kakwa">kakwa</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="dnscherry" class="anchor" href="#dnscherry" aria-hidden="true"><span class="octicon octicon-link"></span></a>dnscherry</h1>
+
+<p>Small cherrypy application to manage dns zone files</p>
+
+<p>.. image:: <a href="https://secure.travis-ci.org/kakwa/dnscherry.png?branch=master">https://secure.travis-ci.org/kakwa/dnscherry.png?branch=master</a>
+    :target: <a href="http://travis-ci.org/kakwa/dnscherry">http://travis-ci.org/kakwa/dnscherry</a>
+    :alt: Travis CI</p>
+
+<p>.. image:: <a href="https://pypip.in/d/dnscherry/badge.png">https://pypip.in/d/dnscherry/badge.png</a>
+    :target: <a href="https://pypi.python.org/pypi/dnscherry">https://pypi.python.org/pypi/dnscherry</a>
+    :alt: Number of PyPI downloads</p>
+
+<hr>
+
+<p>:PyPI: <code>Package &lt;https://pypi.python.org/pypi/dnscherry&gt;</code>_
+:Doc: <code>Documentation &lt;http://dnscherry.readthedocs.org&gt;</code>_
+:License: MIT
+:Author: Pierre-Francois Carpentier - copyright 2014</p>
+
+<hr>
+
+<h1>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h1>
+
+<p>Dnscherry is a small cherrypy application to manage dns zones.
+It can add/delete records from any dns server using tsig and
+dynamic updates.</p>
+
+<h1>
+<a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots</h1>
+
+<p>.. image:: <a href="https://raw.githubusercontent.com/kakwa/dnscherry/master/docs/assets/main_screen.png">https://raw.githubusercontent.com/kakwa/dnscherry/master/docs/assets/main_screen.png</a></p>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>Dnscherry is released under the MIT public license.</p>
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Quick installation guide:</p>
+
+<p>.. sourcecode:: bash</p>
+
+<pre><code>$ pip install dnscherry
+
+# edit configuration according to your dns setup
+$ vim /etc/dnscherry/dnscherry.ini
+
+# launch dnscherryd
+dnscherryd -c /etc/dnscherry/dnscherry.ini
+</code></pre>
+
+<p>It should be accessible from your browser on http://localhost:8080.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
