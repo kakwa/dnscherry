@@ -1,6 +1,10 @@
 dnscherry
 =========
 
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/kakwa/dnscherry
+   :target: https://gitter.im/kakwa/dnscherry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 Small cherrypy application to manage dns zone files
 
 .. image:: https://secure.travis-ci.org/kakwa/dnscherry.png?branch=master
