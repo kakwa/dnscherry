@@ -76,6 +76,9 @@ Configure bind server to use this key:
         type master;
         file "/var/lib/bind/db.example.com";
         allow-update { key "example.com."; };
+        
+        // In case you have an 'allow-transfer { "none"; };' in options
+        //allow-transfer { <dnscherry ip>; };
     };
 
 .. warning::
