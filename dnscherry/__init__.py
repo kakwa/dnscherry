@@ -211,7 +211,7 @@ class DnsCherry(object):
         if level == 'debug':
             return logging.DEBUG
         elif level == 'notice':
-            return logging.NOTICE
+            return logging.INFO
         elif level == 'info':
             return logging.INFO
         elif level == 'warning' or level == 'warn':
@@ -223,7 +223,7 @@ class DnsCherry(object):
         elif level == 'alert':
             return logging.ALERT
         elif level == 'emergency' or level == 'emerg':
-            return logging.EMERGENCY
+            return logging.CRITICAL
         else:
             return logging.INFO
 
