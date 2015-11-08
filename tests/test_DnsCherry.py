@@ -74,6 +74,6 @@ class TestError(object):
 
     def testNominal(self):
         app = DnsCherry()
-        loadconf('./conf/dnscherry.ini', app)
+        loadconf('./tests/cfg/dnscherry.ini', app)
         return True
 
