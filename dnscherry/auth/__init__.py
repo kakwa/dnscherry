@@ -9,6 +9,7 @@ import dnscherry
 
 SESSION_KEY = '_cp_username'
 
+
 class Auth(object):
 
     def __init__(self, config, logger=None):
@@ -37,7 +38,7 @@ class Auth(object):
         """
         if key in config:
             return config[key]
-        if not default is None:
+        if default is not None:
             return default
         else:
             raise dnscherry.MissingParameter('auth', key)
@@ -45,8 +46,8 @@ class Auth(object):
     def _logger(self, severity, message):
         if self.logger:
             self.logger.error(
-                msg = message,
-                severity = severity
+                msg=message,
+                severity=severity
                 )
 
     def end_session(self):
@@ -70,6 +71,6 @@ class Auth(object):
         """
         username = cherrypy.session.get(SESSION_KEY)
         if username:
-           return username
+            return username
         else:
-           raise cherrypy.HTTPRedirect("/signin")
+            raise cherrypy.HTTPRedirect("/signin")

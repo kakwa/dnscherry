@@ -13,21 +13,22 @@ import logging
 import ldap
 
 cfg = {
-'auth.ldap.module'             : 'dnscherry.backend.ldap',
-'auth.ldap.groupdn'            : 'ou=groups,dc=example,dc=org',
-'auth.ldap.userdn'             : 'ou=People,dc=example,dc=org',
-'auth.ldap.binddn'             : 'cn=dnscherry,dc=example,dc=org',
-'auth.ldap.bindpassword'       : 'password',
-'auth.ldap.uri'                : 'ldap://ldap.dnscherry.org:390',
-'auth.ldap.ca'                 : './tests/test_env/etc/dnscherry/TEST-cacert.pem',
-'auth.ldap.starttls'           : 'off',
-'auth.ldap.checkcert'          : 'off',
-'auth.ldap.user.filter.tmpl'   : '(uid=%(login)s)',
-'auth.ldap.group.filter.tmpl'  : '(member=%(userdn)s)',
-'auth.ldap.dn_user_attr'       : 'uid',
-'auth.ldap.group_attr.member'  : "%(dn)s",
-'auth.ldap.timeout'            : 10,
+'auth.ldap.module': 'dnscherry.backend.ldap',
+'auth.ldap.groupdn': 'ou=groups,dc=example,dc=org',
+'auth.ldap.userdn': 'ou=People,dc=example,dc=org',
+'auth.ldap.binddn': 'cn=dnscherry,dc=example,dc=org',
+'auth.ldap.bindpassword': 'password',
+'auth.ldap.uri': 'ldap://ldap.dnscherry.org:390',
+'auth.ldap.ca': './tests/test_env/etc/dnscherry/TEST-cacert.pem',
+'auth.ldap.starttls': 'off',
+'auth.ldap.checkcert': 'off',
+'auth.ldap.user.filter.tmpl': '(uid=%(login)s)',
+'auth.ldap.group.filter.tmpl': '(member=%(userdn)s)',
+'auth.ldap.dn_user_attr': 'uid',
+'auth.ldap.group_attr.member': "%(dn)s",
+'auth.ldap.timeout': 10,
 }
+
 
 def syslog_error(msg='', context='',
         severity=logging.INFO, traceback=False):
@@ -35,6 +36,7 @@ def syslog_error(msg='', context='',
 
 cherrypy.log.error = syslog_error
 attr = ['shéll', 'shell', 'cn', 'uid', 'uidNumber', 'gidNumber', 'home', 'userPassword', 'givenName', 'email', 'sn']
+
 
 class TestError(object):
 

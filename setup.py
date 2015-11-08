@@ -7,11 +7,11 @@ import re
 import sys
 from distutils.core import setup
 
-#some install path variables
+# some install path variables
 sysconfdir = os.getenv("SYSCONFDIR", "/etc")
 datarootdir = os.getenv("DATAROOTDIR", sys.prefix)
 
-data_dir = os.path.join(sys.prefix, 'share' ,'dnscherry')
+data_dir = os.path.join(sys.prefix, 'share', 'dnscherry')
 small_description = 'A simple web application to manage DNS zones'
 
 # change requirements according to python version
@@ -37,7 +37,7 @@ try:
     f.close()
 except IOError:
     description = small_description
-    
+
 try:
     license = open('LICENSE').read()
 except IOError:
@@ -54,7 +54,7 @@ try:
             self.test_suite = True
 
         def run_tests(self):
-            #import here, cause outside the eggs aren't loaded
+            # import here, cause outside the eggs aren't loaded
             import pytest
             errno = pytest.main(self.test_args)
             sys.exit(errno)
@@ -63,6 +63,7 @@ except ImportError:
 
     from distutils.core import setup
     PyTest = lambda x: x
+
 
 # just a small function to easily install a complete directory
 def get_list_files(basedir, targetdir):
@@ -75,39 +76,41 @@ def get_list_files(basedir, targetdir):
         return_list.append((os.path.join(targetdir, subpath), files_list))
     return return_list
 
-resources_files = get_list_files('resources', 
-    os.path.join(datarootdir, 'share', 'dnscherry'))
+resources_files = get_list_files(
+    'resources',
+    os.path.join(datarootdir, 'share', 'dnscherry')
+    )
 
 resources_files.append((
         os.path.join(sysconfdir, 'dnscherry'),
-        [ 'conf/dnscherry.ini']
+        ['conf/dnscherry.ini']
     ))
 
 setup(
-    name             = 'dnscherry',
-    zip_safe         = False,
-    version          = '0.1.0',
-    author           = 'Pierre-Francois Carpentier',
-    author_email     = 'carpentier.pf@gmail.com',
-    packages         = ['dnscherry', 'dnscherry.auth'],
-    data_files       = resources_files,
-    scripts          = ['scripts/dnscherryd'],
-    url              = 'https://github.com/kakwa/dnscherry',
-    license          = license,
-    description      = small_description, 
-    long_description = description,
-    install_requires = install_requires,
-    tests_require    = ['pytest'],
-    extras_require   = {
-            'auth_htpasswd' : ['passlib'],
-            'auth_ldap' : ['python-ldap']
+    name='dnscherry',
+    zip_safe=False,
+    version='0.1.0',
+    author='Pierre-Francois Carpentier',
+    author_email='carpentier.pf@gmail.com',
+    packages=['dnscherry', 'dnscherry.auth'],
+    data_files=resources_files,
+    scripts=['scripts/dnscherryd'],
+    url='https://github.com/kakwa/dnscherry',
+    license=license,
+    description=small_description,
+    long_description=description,
+    install_requires=install_requires,
+    tests_require=['pytest'],
+    extras_require={
+            'auth_htpasswd': ['passlib'],
+            'auth_ldap': ['python-ldap']
         },
-    cmdclass         = {'test': PyTest},
-    classifiers      = [
+    cmdclass={'test': PyTest},
+    classifiers=[
             'Development Status :: 3 - Alpha',
             'Environment :: Web Environment',
             'Framework :: CherryPy',
-	    'Intended Audience :: System Administrators',
+            'Intended Audience :: System Administrators',
             'License :: OSI Approved :: MIT License',
             'Natural Language :: English',
             'Operating System :: POSIX',

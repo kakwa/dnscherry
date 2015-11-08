@@ -4,9 +4,9 @@
 # DnsCherry
 # Copyright (c) 2014 Carpentier Pierre-Francois
 
-
 import cherrypy
 import dnscherry.auth
+
 
 class Auth(dnscherry.auth.Auth):
 
@@ -26,4 +26,6 @@ class Auth(dnscherry.auth.Auth):
                 return cherrypy.request.headers[self.user_header_name]
             else:
                 raise cherrypy.HTTPError(
-                    "403 Forbidden", "You are not allowed to access this resource.")
+                    "403 Forbidden",
+                    "You are not allowed to access this resource."
+                    )

@@ -4,7 +4,6 @@
 # DnsCherry
 # Copyright (c) 2014 Carpentier Pierre-Francois
 
-
 import cherrypy
 import ldap
 import dnscherry.auth
@@ -18,6 +17,7 @@ class CaFileDontExist(Exception):
         self.cafile = cafile
         self.log = "CA file %(cafile)s does not exist" % {'cafile': cafile}
 
+
 class Auth(dnscherry.auth.Auth):
 
     def __init__(self, config, logger=None):
@@ -25,11 +25,17 @@ class Auth(dnscherry.auth.Auth):
         self.logger = logger
         self.logout_button = True
         self.userdn = self._get_param('auth.ldap.userdn', config)
-        self.user_filter_tmpl = self._get_param('auth.ldap.user.filter.tmpl', config)
+        self.user_filter_tmpl = self._get_param(
+            'auth.ldap.user.filter.tmpl',
+            config
+            )
         self.groupdn = self._get_param('auth.ldap.groupdn', config, False)
 
         if self.groupdn:
-            self.group_filter_tmpl = self._get_param('auth.ldap.group.filter.tmpl', config)
+            self.group_filter_tmpl = self._get_param(
+                'auth.ldap.group.filter.tmpl',
+                config
+                )
 
         self.binddn = self._get_param('auth.ldap.binddn', config)
         self.bindpassword = self._get_param('auth.ldap.bindpassword', config)
@@ -85,23 +91,36 @@ class Auth(dnscherry.auth.Auth):
             except ldap.OPERATIONS_ERROR:
                 self._logger(
                     logging.ERROR,
-                    "cannot use starttls with ldaps:// uri (uri: " + self.uri + ")"
+                    "cannot use starttls with ldaps:// uri (uri: " +
+                    self.uri + ")"
                 )
-                raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+                raise cherrypy.HTTPError(
+                        "500",
+                        "Configuration Error, contact administrator"
+                        )
         try:
             ldap_client.simple_bind_s(self.binddn, self.bindpassword)
         except ldap.INVALID_CREDENTIALS:
             self._logger(
                     logging.ERROR,
-                    "Configuration error, wrong credentials, unable to connect to ldap with '" + self.binddn + "'"
+                    "Configuration error, wrong credentials, "
+                    "unable to connect to ldap with '" + self.binddn + "'"
                 )
-            raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+            raise cherrypy.HTTPError(
+                    "500",
+                    "Configuration Error, contact administrator"
+                    )
         except ldap.SERVER_DOWN:
             self._logger(
                     logging.ERROR,
-                    "Unable to contact ldap server '" + self.uri + "', check 'auth.ldap.uri' and ssl/tls configuration" 
+                    "Unable to contact ldap server '" +
+                    self.uri +
+                    "', check 'auth.ldap.uri' and ssl/tls configuration",
                 )
-            raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+            raise cherrypy.HTTPError(
+                    "500",
+                    "Configuration Error, contact administrator"
+                    )
         return ldap_client
 
     def check_credentials(self, username, password):
@@ -112,10 +131,11 @@ class Auth(dnscherry.auth.Auth):
             'login': username
             }
 
-        r = ldap_client.search_s(self.userdn, 
+        r = ldap_client.search_s(
+                self.userdn,
                 ldap.SCOPE_SUBTREE,
                 user_filter
-                 )
+                )
         if len(r) == 0:
             ldap_client.unbind_s()
             return False
@@ -137,10 +157,11 @@ class Auth(dnscherry.auth.Auth):
             group_filter = self.group_filter_tmpl % {
                     'userdn': dn_entry
                     }
-            r = ldap_client.search_s(self.groupdn, 
-                ldap.SCOPE_SUBTREE,
-                group_filter
-                )
+            r = ldap_client.search_s(
+                    self.groupdn,
+                    ldap.SCOPE_SUBTREE,
+                    group_filter
+                    )
             if len(r) == 0:
                 ldap_client.unbind_s()
                 return False
