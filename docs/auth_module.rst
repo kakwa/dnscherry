@@ -86,6 +86,8 @@ Configuration:
     auth.ldap.starttls = 'on'
     # check certificat (optional, default on)
     auth.ldap.checkcert = 'on'
+    # ldap timeout in seconds (default 1 second)
+    auth.ldap.timeout = 2
 
 Implementing your own auth modules
 ----------------------------------
