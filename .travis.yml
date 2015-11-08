@@ -1,25 +1,28 @@
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install bind9
-  - sudo apt-get install ldap-utils
-  - sudo apt-get install python-ldap
-  - sudo  DEBIAN_FRONTEND=noninteractive apt-get install slapd -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  -f -q -y
-  - sudo ./tests/cfg/deploy.sh || true
+  - '[ "$TEST_PEP8" == "1" ] || sudo apt-get update -qq'
+  - '[ "$TEST_PEP8" == "1" ] || sudo apt-get install bind9'
+  - '[ "$TEST_PEP8" == "1" ] || sudo apt-get install ldap-utils'
+  - '[ "$TEST_PEP8" == "1" ] || sudo apt-get install python-ldap'
+  - '[ "$TEST_PEP8" == "1" ] || sudo  DEBIAN_FRONTEND=noninteractive apt-get install slapd -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  -f -q -y'
+  - '[ "$TEST_PEP8" == "1" ] || sudo ./tests/cfg/deploy.sh || true'
 
 language: python
 matrix:
   include:
     - python: "2.7"
       env: TEST_PEP8=1
+    - python: "2.7"
+      env: TEST_PEP8=0
 
 # command to install dependencies
 install: 
-  - pip install -e . --use-mirrors
-  - pip install passlib
-  - pip install python-ldap
-  - pip install coveralls
+  - "pip install -e . --use-mirrors"
+  - "pip install passlib"
+  - "pip install python-ldap"
+  - "pip install coveralls"
+  - "if [[ $TEST_PEP8 == '1' ]]; then pip install pep8; fi"
 # command to run tests
-script: if [[ $TEST_PEP8 == '1' ]]; then pep8 --repeat --show-source --exclude=.venv,.tox,dist,docs,build,*.egg,tests,misc . scripts/yd; else coverage run --source=dnscherry setup.py test; fi 
+script: "if [[ $TEST_PEP8 == '1' ]]; then pep8 --repeat --show-source --exclude=.venv,.tox,dist,docs,build,*.egg,tests,misc . scripts/yd; else coverage run --source=dnscherry setup.py test; fi"
 
 after_success:
   - coveralls
