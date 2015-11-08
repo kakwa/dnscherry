@@ -36,6 +36,35 @@ from mako import lookup
 
 SESSION_KEY = '_cp_username'
 
+def syslog_error(
+        msg='',
+        context='',
+        severity=logging.INFO,
+        traceback=False
+        ):
+
+    if traceback and msg == '':
+        msg = 'Python Exception:'
+    if context == '':
+        cherrypy.log.error_log.log(severity, msg)
+    else:
+        cherrypy.log.error_log.log(
+            severity,
+            ' '.join((context, msg))
+            )
+    if traceback:
+        import traceback
+        try:
+            exc = sys.exc_info()
+            if exc == (None, None, None):
+                cherrypy.log.error_log.log(severity, msg)
+            # log each line of the exception
+            # in a separate log for lisibility
+            for l in traceback.format_exception(*exc):
+                cherrypy.log.error_log.log(severity, l)
+        finally:
+            del exc
+
 
 # some custom exceptions
 class NoRecordSelected(Exception):
@@ -141,21 +170,6 @@ class DnsCherry(object):
             if error_handler == 'syslog':
                 cherrypy.log.error_log.handlers = []
 
-                # redefining log.error method because cherrypy does weird
-                # things like adding the date inside the message
-                # or adding space even if context is empty
-                # (by the way, what's the use of "context"?)
-                def syslog_error(msg='', context='',
-                                 severity=logging.INFO, traceback=False):
-                    if traceback:
-                        msg += cherrypy._cperror.format_exc()
-                    if context == '':
-                        cherrypy.log.error_log.log(severity, msg)
-                    else:
-                        cherrypy.log.error_log.log(
-                            severity,
-                            ' '.join(context, msg)
-                            )
                 cherrypy.log.error = syslog_error
 
                 handler = logging.handlers.SysLogHandler(
