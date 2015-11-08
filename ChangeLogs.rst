@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.1.1
+*************
+
+* fix configuration overwrite in setup.py
+* fix syslog message error
+
 Version 0.1.0
 *************
 
