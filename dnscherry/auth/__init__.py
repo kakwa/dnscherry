@@ -49,7 +49,6 @@ class Auth(object):
                 severity = severity
                 )
 
-
     def end_session(self):
         """ remove the session from the session database
         @rtype: str, the owner of the removed session
