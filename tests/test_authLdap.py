@@ -18,7 +18,7 @@ cfg = {
 'auth.ldap.userdn': 'ou=People,dc=example,dc=org',
 'auth.ldap.binddn': 'cn=dnscherry,dc=example,dc=org',
 'auth.ldap.bindpassword': 'password',
-'auth.ldap.uri': 'ldap://ldap.dnscherry.org:390',
+'auth.ldap.uri': 'ldap://ldap.dnscherry.org:389',
 'auth.ldap.ca': './tests/test_env/etc/dnscherry/TEST-cacert.pem',
 'auth.ldap.starttls': 'off',
 'auth.ldap.checkcert': 'off',
@@ -46,7 +46,7 @@ class TestError(object):
 
     def testConnectSSLNoCheck(self):
         cfg2 = cfg.copy()
-        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:637'
+        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:636'
         cfg2['checkcert'] = 'off'
         inv = Auth(cfg2, cherrypy.log)
         ldap = inv._connect()
@@ -60,7 +60,7 @@ class TestError(object):
 
     def testConnectSSL(self):
         cfg2 = cfg.copy()
-        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:637'
+        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:636'
         cfg2['checkcert'] = 'on'
         inv = Auth(cfg2, cherrypy.log)
         ldap = inv._connect()
@@ -68,7 +68,7 @@ class TestError(object):
 
     def testLdapUnavaible(self):
         cfg2 = cfg.copy()
-        cfg2['uri'] = 'ldaps://notaldap:637'
+        cfg2['uri'] = 'ldaps://notaldap:636'
         cfg2['checkcert'] = 'on'
         inv = Auth(cfg2, cherrypy.log)
         try:
@@ -79,7 +79,7 @@ class TestError(object):
 
     def testMissingCA(self):
         cfg2 = cfg.copy()
-        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:637'
+        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:636'
         cfg2['checkcert'] = 'on'
         cfg2['ca'] = './test/cfg/not_a_ca.crt'
         try:
@@ -90,7 +90,7 @@ class TestError(object):
 
     def testConnectSSLWrongCA(self):
         cfg2 = cfg.copy()
-        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:637'
+        cfg2['uri'] = 'ldaps://ldap.dnscherry.org:636'
         cfg2['checkcert'] = 'on'
         inv = Auth(cfg2, cherrypy.log)
         ldapc = inv._connect()
