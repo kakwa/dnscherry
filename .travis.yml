@@ -4,7 +4,7 @@ before_install:
   - sudo apt-get install ldap-utils
   - sudo apt-get install python-ldap
   - sudo  DEBIAN_FRONTEND=noninteractive apt-get install slapd -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  -f -q -y
-  - sudo ./run_test.sh || true 
+  - sudo ./tests/cfg/deploy.sh || true
 
 language: python
 matrix:
