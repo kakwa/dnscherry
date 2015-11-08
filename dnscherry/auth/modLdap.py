@@ -12,6 +12,12 @@ import logging
 
 SESSION_KEY = '_cp_username'
 
+
+class CaFileDontExist(Exception):
+    def __init__(self, cafile):
+        self.cafile = cafile
+        self.log = "CA file %(cafile)s does not exist" % {'cafile': cafile}
+
 class Auth(dnscherry.auth.Auth):
 
     def __init__(self, config, logger=None):
@@ -31,10 +37,9 @@ class Auth(dnscherry.auth.Auth):
         self.ca = self._get_param('auth.ldap.ca', config, False)
         self.starttls = self._get_param('auth.ldap.starttls', config, 'off')
         self.checkcert = self._get_param('auth.ldap.checkcert', config, 'on')
-        self.timeout = self.get_param('auth.ldap.timeout', 1)
+        self.timeout = self._get_param('auth.ldap.timeout', config, 1)
 
-    def check_credentials(self, username, password):
-
+    def _connect(self):
         ldap_client = ldap.initialize(self.uri)
         ldap_client.set_option(ldap.OPT_REFERRALS, 0)
         ldap.set_option(ldap.OPT_TIMEOUT, self.timeout)
@@ -96,7 +101,12 @@ class Auth(dnscherry.auth.Auth):
                     logging.ERROR,
                     "Unable to contact ldap server '" + self.uri + "', check 'auth.ldap.uri' and ssl/tls configuration" 
                 )
-            return False
+            raise cherrypy.HTTPError("500", "Configuration Error, contact administrator")
+        return ldap_client
+
+    def check_credentials(self, username, password):
+
+        ldap_client = self._connect()
 
         user_filter = self.user_filter_tmpl % {
             'login': username
