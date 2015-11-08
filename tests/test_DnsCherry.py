@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import with_statement
+from __future__ import unicode_literals
+
+import pytest
+import sys
+import subprocess
+from tempfile import NamedTemporaryFile as tempfile
+import re
+
+from sets import Set
+from dnscherry import DnsCherry
+
+import cherrypy
+from cherrypy.process import plugins, servers
+from cherrypy import Application
+import logging
+
+cherrypy.session = {}
+
+
+def loadconf(configfile, instance):
+    app = cherrypy.tree.mount(instance, '/', configfile)
+    cherrypy.config.update(configfile)
+    instance.reload(app.config)
+
+class HtmlValidationFailed(Exception):
+    def __init__(self, out):
+        self.errors = out
+
+def htmlvalidator(page):
+    f = tempfile()
+    stdout = tempfile()
+    f.write(page.encode("utf-8"))
+    f.seek(0)
+    ret = subprocess.call(['./tests/html_validator.py', '-h', f.name], stdout=stdout)
+    stdout.seek(0)
+    out = stdout.read()
+    f.close()
+    stdout.close()
+    print(out)
+    if not re.search(r'Error:.*', out) is None:
+        raise HtmlValidationFailed(out)
+
+class BadModule():
+    pass
+
+
+# monkey patching cherrypy to disable config interpolation
+def new_as_dict(self, raw=True, vars=None):
+    """Convert an INI file to a dictionary"""
+    # Load INI file into a dict
+    result = {}
+    for section in self.sections():
+        if section not in result:
+            result[section] = {}
+        for option in self.options(section):
+            value = self.get(section, option, raw=raw, vars=vars)
+            try:
+                value = cherrypy.lib.reprconf.unrepr(value)
+            except Exception:
+                x = sys.exc_info()[1]
+                msg = ("Config error in section: %r, option: %r, "
+                       "value: %r. Config values must be valid Python." %
+                       (section, option, value))
+                raise ValueError(msg, x.__class__.__name__, x.args)
+            result[section][option] = value
+    return result
+cherrypy.lib.reprconf.Parser.as_dict = new_as_dict
+
+class TestError(object):
+
+    def testNominal(self):
+        app = DnsCherry()
+        loadconf('./conf/dnscherry.ini', app)
+        return True
+
