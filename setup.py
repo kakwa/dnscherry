@@ -86,7 +86,7 @@ resources_files.append((
 setup(
     name             = 'dnscherry',
     zip_safe         = False,
-    version          = '0.0.1',
+    version          = '0.1.0',
     author           = 'Pierre-Francois Carpentier',
     author_email     = 'carpentier.pf@gmail.com',
     packages         = ['dnscherry', 'dnscherry.auth'],
