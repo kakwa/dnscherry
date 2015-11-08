@@ -81,7 +81,12 @@ resources_files = get_list_files(
     os.path.join(datarootdir, 'share', 'dnscherry')
     )
 
-resources_files.append((
+conffile = os.path.join(
+               sysconfdir, 
+               'dnscherry/dnscherry.ini'
+           )
+if not os.path.exists(conffile):
+    resources_files.append((
         os.path.join(sysconfdir, 'dnscherry'),
         ['conf/dnscherry.ini']
     ))
