@@ -82,8 +82,7 @@ resources_files = get_list_files(
     )
 
 conffile = os.path.join(
-               sysconfdir, 
-               'dnscherry/dnscherry.ini'
+               sysconfdir, 'dnscherry', 'dnscherry.ini'
            )
 if not os.path.exists(conffile):
     resources_files.append((
