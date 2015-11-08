@@ -22,7 +22,7 @@ install:
   - "pip install coveralls"
   - "if [[ $TEST_PEP8 == '1' ]]; then pip install pep8; fi"
 # command to run tests
-script: "if [[ $TEST_PEP8 == '1' ]]; then pep8 --repeat --show-source --exclude=.venv,.tox,dist,docs,build,*.egg,tests,misc,setup.py . scripts/yd; else coverage run --source=dnscherry setup.py test; fi"
+script: "if [[ $TEST_PEP8 == '1' ]]; then pep8 --repeat --show-source --exclude=.venv,.tox,dist,docs,build,*.egg,tests,misc,setup.py . ; else coverage run --source=dnscherry setup.py test; fi"
 
 after_success:
   - coveralls
