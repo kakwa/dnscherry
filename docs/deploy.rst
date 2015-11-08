@@ -223,15 +223,6 @@ Other DnsCherry parameters
     #don't show traceback on error
     request.show_tracebacks = False
     
-    #####################################
-    #        Form configuration         #
-    #####################################
-    # redirect to zone page after adding/deleting a record
-    # if 'on', redirects to zone page
-    # if 'off', stays on a summary page
-    form.add.redirect = 'on'
-    form.del.redirect = 'on'
-    
     # session configuration
     # activate session
     tools.sessions.on = True

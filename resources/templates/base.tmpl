@@ -33,6 +33,7 @@
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/scripts.js"></script>
     <script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-notify.js"></script>
 
     <script>
     $(function(){
@@ -42,6 +43,11 @@
 
 </head>
 <body>
+% if notifications:
+% for notif in notifications:
+<script type="text/javascript">$.notify('${notif}')</script>
+% endfor
+% endif
 <div class="container">
     <%block name="navbar"/>
     <%block name="core" />

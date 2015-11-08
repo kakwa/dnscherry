@@ -85,19 +85,6 @@ class DnsCherry(object):
                         self._get_param('dns', 'type.written', config, 'CNAME, A, AAAA')
                     )
 
-            # set if redirect on zone page after add or if
-            # display a summary of the added entries
-            if self._get_param('global', 'form.add.redirect', config, 'on') == 'on':
-                self.form_add_redirect = True
-            else:
-                self.form_add_redirect = False
-
-            # same for delete
-            if self._get_param('global', 'form.del.redirect', config, 'on') == 'on':
-                self.form_del_redirect = True
-            else:
-                self.form_del_redirect = False
-
             # log configuration handling
             # get log level 
             # (if not in configuration file, log level is set to debug)
@@ -181,6 +168,9 @@ class DnsCherry(object):
             auth = __import__(auth_module, globals(), locals(), ['Auth'], -1)
             self.auth = auth.Auth(config['auth'], cherrypy.log)
 
+            # initialize notitication
+            self.notifications = {}
+
         except MissingParameter as e:
             cherrypy.log.error(
                 msg = "dnscherry failure, "\
@@ -208,8 +198,9 @@ class DnsCherry(object):
         """
         sess = cherrypy.session
         username = sess.get(SESSION_KEY, None)
-        if username is not self.notifications:
+        if username not in self.notifications:
             self.notifications[username] = []
+        message = re.sub(r'\'', '\\\'', message)
         self.notifications[username].append(message)
 
     def _empty_notification(self):
@@ -547,7 +538,8 @@ class DnsCherry(object):
                 zone_list=self.zone_list,
                 default_ttl = self.default_ttl,
                 type_written = self.type_written,
-                current_zone = zone
+                current_zone = zone,
+                notifications=self._empty_notification(),
                 )
 
     @cherrypy.expose
@@ -596,23 +588,17 @@ class DnsCherry(object):
                     'user': user 
                     }
 
+            self._add_notification(message)
             cherrypy.log.error(
                 msg = message,
                 severity = logging.INFO
             )
+            cherrypy.log.error(
+                msg = str(self.notifications),
+                severity = logging.INFO
+            )
         
-        if self.form_del_redirect:
-            raise cherrypy.HTTPRedirect("/?zone=" + zone)
-        else:
-            return self.temp_result.render(
-                    logout_button = self.auth.logout_button,
-                    records = deleted_records,
-                    zone_list = self.zone_list,
-                    current_zone = zone,
-                    message = self.sucess_message_del,
-                    alert = 'success',
-                    action = 'del'
-                    )
+        raise cherrypy.HTTPRedirect("/?zone=" + zone)
 
     @cherrypy.expose
     def add_record(self, key=None, ttl=None, type=None, 
@@ -647,21 +633,10 @@ class DnsCherry(object):
                     'user': user
                     }
 
+        self._add_notification(message)
         cherrypy.log.error(
             msg = message,
             severity = logging.INFO
          )
 
-        if self.form_add_redirect:
-            raise cherrypy.HTTPRedirect("/?zone=" + zone)
-        else:
-            return self.temp_result.render(
-                    logout_button = self.auth.logout_button,
-                    records = new_record,
-                    zone_list = self.zone_list,
-                    current_zone = zone,
-                    message = self.sucess_message_add,
-                    alert = 'success',
-                    action = 'add'
-                    )
-
+        raise cherrypy.HTTPRedirect("/?zone=" + zone)
