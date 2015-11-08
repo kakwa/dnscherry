@@ -203,6 +203,27 @@ class DnsCherry(object):
         self.zone_list = {}
         self._parse_zones(config)
 
+    def _add_notification(self, message):
+        """ add a notification in the notification queue of a user
+        """
+        sess = cherrypy.session
+        username = sess.get(SESSION_KEY, None)
+        if username is not self.notifications:
+            self.notifications[username] = []
+        self.notifications[username].append(message)
+
+    def _empty_notification(self):
+        """ empty and return list of message notification
+        """
+        sess = cherrypy.session
+        username = sess.get(SESSION_KEY, None)
+        if username in self.notifications:
+            ret = self.notifications[username]
+        else:
+            ret = []
+        self.notifications[username] = []
+        return ret
+
     def _get_loglevel(self, level):
         """ return logging level object
         corresponding to a given level passed as
