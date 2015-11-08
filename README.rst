@@ -1,19 +1,26 @@
-dnscherry
+DnsCherry
 =========
 
-.. image:: https://badges.gitter.im/Join%20Chat.svg
-   :alt: Join the chat at https://gitter.im/kakwa/dnscherry
-   :target: https://gitter.im/kakwa/dnscherry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+.. image:: https://raw.githubusercontent.com/kakwa/dnscherry/master/resources/static/img/apple-touch-icon-72-precomposed.png
 
-Small cherrypy application to manage dns zone files
 
-.. image:: https://secure.travis-ci.org/kakwa/dnscherry.png?branch=master
-    :target: http://travis-ci.org/kakwa/dnscherry
-    :alt: Travis CI
+.. image:: https://travis-ci.org/kakwa/dnscherry.svg?branch=master
+    :target: https://travis-ci.org/kakwa/dnscherry
+    
+.. image:: https://coveralls.io/repos/kakwa/dnscherry/badge.svg 
+    :target: https://coveralls.io/r/kakwa/dnscherry
 
-.. image:: https://pypip.in/d/dnscherry/badge.png
+.. image:: https://img.shields.io/pypi/dm/dnscherry.svg
     :target: https://pypi.python.org/pypi/dnscherry
     :alt: Number of PyPI downloads
+    
+.. image:: https://img.shields.io/pypi/v/dnscherry.svg
+    :target: https://pypi.python.org/pypi/dnscherry
+    :alt: PyPI version
+
+.. image:: https://readthedocs.org/projects/dnscherry/badge/?version=latest
+    :target: http://dnscherry.readthedocs.org/en/latest/?badge=latest
+    :alt: Documentation Status
 
 ----
 
