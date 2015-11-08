@@ -31,20 +31,48 @@ class Auth(dnscherry.auth.Auth):
         self.ca = self._get_param('auth.ldap.ca', config, False)
         self.starttls = self._get_param('auth.ldap.starttls', config, 'off')
         self.checkcert = self._get_param('auth.ldap.checkcert', config, 'on')
+        self.timeout = self.get_param('auth.ldap.timeout', 1)
 
     def check_credentials(self, username, password):
 
         ldap_client = ldap.initialize(self.uri)
         ldap_client.set_option(ldap.OPT_REFERRALS, 0)
+        ldap.set_option(ldap.OPT_TIMEOUT, self.timeout)
 
         if self.starttls == 'on':
             ldap.set_option(ldap.OPT_X_TLS_DEMAND, True)
-        if self.ca:
-            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
+        else:
+            ldap.set_option(ldap.OPT_X_TLS_DEMAND, False)
+        # set the CA file if declared and if necessary
+        if self.ca and self.checkcert == 'on':
+            # check if the CA file actually exists
+            if os.path.isfile(self.ca):
+                ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, self.ca)
+            else:
+                raise CaFileDontExist(self.ca)
         if self.checkcert == 'off':
-            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
-        else: 
-            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,ldap.OPT_X_TLS_DEMAND)
+            # this is dark magic
+            # remove any of these two lines and it doesn't work
+            ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+            ldap_client.set_option(
+                ldap.OPT_X_TLS_REQUIRE_CERT,
+                ldap.OPT_X_TLS_NEVER
+                )
+        else:
+            # this is even darker magic
+            ldap_client.set_option(
+                ldap.OPT_X_TLS_REQUIRE_CERT,
+                ldap.OPT_X_TLS_DEMAND
+                )
+            # it doesn't make sense to set it to never
+            # (== don't check certifate)
+            # but it only works with this option...
+            # ... and it checks the certificat
+            # (I've lost my sanity over this)
+            ldap.set_option(
+                ldap.OPT_X_TLS_REQUIRE_CERT,
+                ldap.OPT_X_TLS_NEVER
+                )
 
         if self.starttls == 'on':
             try:
