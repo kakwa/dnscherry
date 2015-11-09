@@ -36,6 +36,7 @@ from mako import lookup
 
 SESSION_KEY = '_cp_username'
 
+
 def syslog_error(
         msg='',
         context='',
