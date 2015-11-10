@@ -271,7 +271,7 @@ class DnsCherry(object):
         elif level == 'critical' or level == 'crit':
             return logging.CRITICAL
         elif level == 'alert':
-            return logging.ALERT
+            return logging.CRITICAL
         elif level == 'emergency' or level == 'emerg':
             return logging.CRITICAL
         else:
