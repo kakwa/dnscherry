@@ -90,3 +90,17 @@ class TestError(object):
             {'content': 'asd', 'type': 'CNAME', 'class': 'IN', 'key': 'asdaasd', 'ttl': '3600'},
         ]
         assert ret == expected
+
+    def testLogger(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        assert app._get_loglevel('debug') is logging.DEBUG and \
+        app._get_loglevel('notice') is logging.INFO and \
+        app._get_loglevel('info') is logging.INFO and \
+        app._get_loglevel('warning') is logging.WARNING and \
+        app._get_loglevel('err') is logging.ERROR and \
+        app._get_loglevel('critical') is logging.CRITICAL and \
+        app._get_loglevel('alert') is logging.CRITICAL and \
+        app._get_loglevel('emergency') is logging.CRITICAL and \
+        app._get_loglevel('notalevel') is logging.INFO
+
