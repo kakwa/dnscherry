@@ -75,5 +75,18 @@ class TestError(object):
     def testNominal(self):
         app = DnsCherry()
         loadconf('./tests/cfg/dnscherry.ini', app)
-        return True
 
+    def testDnsGet(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        ret = app._refresh_zone('example.com')
+        expected = [
+            {'content': '192.168.0.16', 'type': 'A', 'class': 'IN', 'key': 'asda', 'ttl': '3600'},
+            {'content': '192.168.0.4', 'type': 'A', 'class': 'IN', 'key': 'www', 'ttl': '3600'},
+            {'content': '2001:db8:10::2', 'type': 'AAAA', 'class': 'IN', 'key': 'ns', 'ttl': '3600'},
+            {'content': '192.168.0.20', 'type': 'A', 'class': 'IN', 'key': 'asds', 'ttl': '3600'},
+            {'content': '192.168.0.11', 'type': 'A', 'class': 'IN', 'key': 'asdaaaa', 'ttl': '3600'},
+            {'content': '192.168.0.4', 'type': 'A', 'class': 'IN', 'key': '123', 'ttl': '3600'},
+            {'content': 'asd', 'type': 'CNAME', 'class': 'IN', 'key': 'asdaasd', 'ttl': '3600'},
+        ]
+        assert ret == expected
