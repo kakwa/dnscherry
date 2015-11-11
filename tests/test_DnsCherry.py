@@ -104,6 +104,20 @@ class TestError(object):
         app._get_loglevel('emergency') is logging.CRITICAL and \
         app._get_loglevel('notalevel') is logging.INFO
 
+    def testAddDel(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        try:
+            app.add_record('test', '3600', 'A', 'example.com', '192.168.0.1')
+        except cherrypy.HTTPRedirect as e:
+            if e[0][0] != 'http://127.0.0.1:8080/?zone=example.com':
+                return False
+        try:
+            app.del_record(['test;A;192.168.0.1;IN;3600'], 'example.com')
+        except cherrypy.HTTPRedirect as e:
+            if e[0][0] != 'http://127.0.0.1:8080/?zone=example.com':
+                return False
+
     def testHtml(self):
         app = DnsCherry()
         loadconf('./tests/cfg/dnscherry.ini', app)
