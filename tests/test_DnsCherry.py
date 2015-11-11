@@ -104,3 +104,14 @@ class TestError(object):
         app._get_loglevel('emergency') is logging.CRITICAL and \
         app._get_loglevel('notalevel') is logging.INFO
 
+    def testHtml(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        pages = {
+                'signin': app.signin(),
+                'index': app.index(),
+                }
+        for page in pages:
+            print(page)
+            htmlvalidator(pages[page])
+
