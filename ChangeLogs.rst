@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.1.2
+*************
+
+* fix html templates
+
 Version 0.1.1
 *************
 

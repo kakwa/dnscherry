@@ -94,7 +94,7 @@ if not os.path.exists(conffile):
 setup(
     name='dnscherry',
     zip_safe=False,
-    version='0.1.1',
+    version='0.1.2',
     author='Pierre-Francois Carpentier',
     author_email='carpentier.pf@gmail.com',
     packages=['dnscherry', 'dnscherry.auth'],
