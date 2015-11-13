@@ -75,5 +75,57 @@ class TestError(object):
     def testNominal(self):
         app = DnsCherry()
         loadconf('./tests/cfg/dnscherry.ini', app)
-        return True
+
+    def testDnsGet(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        ret = app._refresh_zone('example.com')
+        expected = [
+            {'content': '192.168.0.16', 'type': 'A', 'class': 'IN', 'key': 'asda', 'ttl': '3600'},
+            {'content': '192.168.0.4', 'type': 'A', 'class': 'IN', 'key': 'www', 'ttl': '3600'},
+            {'content': '2001:db8:10::2', 'type': 'AAAA', 'class': 'IN', 'key': 'ns', 'ttl': '3600'},
+            {'content': '192.168.0.20', 'type': 'A', 'class': 'IN', 'key': 'asds', 'ttl': '3600'},
+            {'content': '192.168.0.11', 'type': 'A', 'class': 'IN', 'key': 'asdaaaa', 'ttl': '3600'},
+            {'content': '192.168.0.4', 'type': 'A', 'class': 'IN', 'key': '123', 'ttl': '3600'},
+            {'content': 'asd', 'type': 'CNAME', 'class': 'IN', 'key': 'asdaasd', 'ttl': '3600'},
+        ]
+        assert ret == expected
+
+    def testLogger(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        assert app._get_loglevel('debug') is logging.DEBUG and \
+        app._get_loglevel('notice') is logging.INFO and \
+        app._get_loglevel('info') is logging.INFO and \
+        app._get_loglevel('warning') is logging.WARNING and \
+        app._get_loglevel('err') is logging.ERROR and \
+        app._get_loglevel('critical') is logging.CRITICAL and \
+        app._get_loglevel('alert') is logging.CRITICAL and \
+        app._get_loglevel('emergency') is logging.CRITICAL and \
+        app._get_loglevel('notalevel') is logging.INFO
+
+    def testAddDel(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        try:
+            app.add_record('test', '3600', 'A', 'example.com', '192.168.0.1')
+        except cherrypy.HTTPRedirect as e:
+            if e[0][0] != 'http://127.0.0.1:8080/?zone=example.com':
+                return False
+        try:
+            app.del_record(['test;A;192.168.0.1;IN;3600'], 'example.com')
+        except cherrypy.HTTPRedirect as e:
+            if e[0][0] != 'http://127.0.0.1:8080/?zone=example.com':
+                return False
+
+    def testHtml(self):
+        app = DnsCherry()
+        loadconf('./tests/cfg/dnscherry.ini', app)
+        pages = {
+                'signin': app.signin(),
+                'index': app.index(),
+                }
+        for page in pages:
+            print(page)
+            htmlvalidator(pages[page])
 

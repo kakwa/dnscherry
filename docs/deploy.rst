@@ -4,7 +4,7 @@ Deploy
 Launching DnsCherry
 -------------------
 
-DnsCherry can be launch using cherrypy internal webserver:
+DnsCherry can be launched using cherrypy internal webserver:
 
 
 .. sourcecode:: bash
@@ -34,7 +34,7 @@ DnsCherry can be launch using cherrypy internal webserver:
 Dns Configuration
 -----------------
 
-This section presents the configuration of a zone **example.com**, change it with your own zone name. 
+This section presents the configuration of a zone **example.com**, change it with your own zone name.
 
 Creation of the tsig key
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,10 +60,10 @@ To create a tsig key, use the following commands:
 
 The important field for us is **Key**, it's this field which will be used in the dns server and DnsCherry.
 
-Bind server tsig configuration
+Bind server TSIG configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Configure bind server to use this key:
+Configure Bind server to use this key:
 
 .. sourcecode:: none
 
@@ -83,7 +83,7 @@ Configure bind server to use this key:
 
 .. warning::
 
-    Bind must have writing rights on **/var/lib/bind/db.example.com** and **/var/lib/bind/**.
+    The user running bind must have writing rights on **/var/lib/bind/db.example.com** and **/var/lib/bind/**.
 
 DnsCherry configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,8 +104,11 @@ Configure the zone in DnsCherry:
     # hmac key
     key.example.com = 'oWko9cBK6yUDnhl8R6g0drseVc2t9erYIiHD/u9t31iMYR+rbF5Y7IXeVdGCwEDe3fpQVYWvZosUzScZ5VStLA=='
 
-You can configure multiple zones by adding **ip.<your domain>**, **algorithm.<your domain>** 
-and **key.<your domain>** in the **[dns.zones]** section.
+You can configure multiple zones by adding the following parameters in the **[dns.zones]** section:
+
+* **ip.<your domain>**
+* **algorithm.<your domain>** 
+* **key.<your domain>**
 
 example:
 
@@ -155,7 +158,7 @@ Logs
 ----
 
 DnsCherry has two loggers, one for errors and actions (login, del/add, logout...) and one for access logs.
-Each logger can be configured to log to syslog, file or be unactivated. 
+Each logger can be configured to log to syslog, file or be disabled. 
 
 .. warning::
 
@@ -259,7 +262,7 @@ Cherrypy has an embeded web sever which can be used for testing.
 
 It has some severe limitations:
 
-* no SSL/TLS (which is recommanded)
+* no SSL/TLS
 * no listening on the standard http port 80
 
 To make DnsCherry listens on every IP:
@@ -279,7 +282,6 @@ Nginx
 .. literalinclude:: ../goodies/nginx.conf
    :language: none
 
-
 Apache
 ~~~~~~
 
@@ -292,6 +294,12 @@ Lighttpd
 .. literalinclude:: ../goodies/lighttpd.conf
    :language: none
 
+DnsCherry configuration file
+----------------------------
+
+.. literalinclude:: ../conf/dnscherry.ini
+   :language: ini
+
 Init Script
 -----------
 
@@ -301,10 +309,3 @@ Sample init script for Debian:
    :language: bash
 
 This init script is available in **goodies/init-debian**.
-
-DnsCherry configuration file
-----------------------------
-
-.. literalinclude:: ../conf/dnscherry.ini
-   :language: ini
-

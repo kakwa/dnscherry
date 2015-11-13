@@ -2,29 +2,28 @@
 <%block name="core">
     <div class="row clearfix">
         <div class="col-md-12 column">
-            <form method='POST' action='/add_record/' role="form" class="form-inline">
-                <input type="hidden" name="zone" value="${current_zone}" />
+            <form method='POST' action='/add_record?zone=${current_zone}' class="form-inline" id="add_entry">
                 <div class="form-group">
-                     <label for="key">Record key</label><input type="text" class="form-control" name="key">
+                     <label for="key">Record key</label><input type="text" class="form-control" name="key" id="key">
                 </div>
                 <div class="form-group">
-                     <label for="TTL">TTL</label><input type="text" class="form-control" name="ttl" value="${default_ttl}">
+                     <label for="ttl">TTL</label><input type="text" class="form-control" name="ttl" id="ttl" value="${default_ttl}">
                 </div>
                 <div class="form-group">
                     <label for="type">Type</label>
-                    <select class="form-control" name="type">
+                    <select class="form-control" name="type" id="type">
                           %for type in type_written:
                           <option>${type}</option>
                           %endfor
                     </select>
                 </div>
                 <div class="form-group">
-                     <label for="type">Content</label>
-                     <input type="text" class="form-control" name="content">
+                     <label for="content">Content</label>
+                     <input type="text" class="form-control" name="content" id="content">
                 </div>
                 <div class="form-group">
                     <label for="submit">Submit</label>
-                    <button type="submit" class="form-control btn btn-default green"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+                    <button type="submit" id="submit" class="form-control btn btn-default green"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
                 </div>
             </form>
         </div>
@@ -32,8 +31,7 @@
 	<div class="row clearfix top-buffer bottom-buffer">
 		<div class="col-md-12 column">
             <div class="well well-sm">
-				<form method='POST' action='/del_record/' role="form" class="form-inline">
-                    <input type="hidden" name="zone" value="${current_zone}" />
+				<form method='POST' action='/del_record?zone=${current_zone}' class="form-inline">
 					<table id="RecordTable" class="table table-hover table-condensed tablesorter">
 						<thead>
 							<tr>
