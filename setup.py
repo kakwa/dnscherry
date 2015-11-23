@@ -98,7 +98,7 @@ if as_option_root or not os.path.exists(conffile):
 setup(
     name='dnscherry',
     zip_safe=False,
-    version='0.1.2',
+    version='0.1.3',
     author='Pierre-Francois Carpentier',
     author_email='carpentier.pf@gmail.com',
     packages=['dnscherry', 'dnscherry.auth'],

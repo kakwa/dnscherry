@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.1.3
+*************
+
+* fix configuration install setup.py if --root is specified
+
 Version 0.1.2
 *************
 
