@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'DnsCherry - Performance Test Framework'
+project = u'DnsCherry - Dns administration Web UI'
 copyright = u'2014, Pierre-Francois Carpentier'
 
 # The version info for the project you're documenting, acts as replacement for
