@@ -64,6 +64,11 @@ except ImportError:
     from distutils.core import setup
     PyTest = lambda x: x
 
+def as_option_root():
+    for arg in sys.argv:
+        if re.match(r'--root.*', arg):
+            return True
+    return False
 
 # just a small function to easily install a complete directory
 def get_list_files(basedir, targetdir):
@@ -84,7 +89,7 @@ resources_files = get_list_files(
 conffile = os.path.join(
                sysconfdir, 'dnscherry', 'dnscherry.ini'
            )
-if not os.path.exists(conffile):
+if as_option_root or not os.path.exists(conffile):
     resources_files.append((
         os.path.join(sysconfdir, 'dnscherry'),
         ['conf/dnscherry.ini']
