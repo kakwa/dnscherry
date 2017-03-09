@@ -9,10 +9,6 @@ DnsCherry
     
 .. image:: https://coveralls.io/repos/kakwa/dnscherry/badge.svg 
     :target: https://coveralls.io/r/kakwa/dnscherry
-
-.. image:: https://img.shields.io/pypi/dm/dnscherry.svg
-    :target: https://pypi.python.org/pypi/dnscherry
-    :alt: Number of PyPI downloads
     
 .. image:: https://img.shields.io/pypi/v/dnscherry.svg
     :target: https://pypi.python.org/pypi/dnscherry
