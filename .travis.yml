@@ -16,7 +16,7 @@ matrix:
 
 # command to install dependencies
 install: 
-  - "pip install -e . --use-mirrors"
+  - "pip install -e ."
   - "pip install passlib"
   - "pip install python-ldap"
   - "pip install coveralls"
