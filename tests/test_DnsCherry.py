@@ -22,6 +22,7 @@ cherrypy.session = {}
 
 
 def loadconf(configfile, instance):
+    configfile = str(configfile)
     app = cherrypy.tree.mount(instance, '/', configfile)
     cherrypy.config.update(configfile)
     instance.reload(app.config)
