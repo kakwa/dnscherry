@@ -42,7 +42,7 @@ def syslog_error(
         context='',
         severity=logging.INFO,
         traceback=False
-        ):
+):
 
     if traceback and msg == '':
         msg = 'Python Exception:'
@@ -52,7 +52,7 @@ def syslog_error(
         cherrypy.log.error_log.log(
             severity,
             ' '.join((context, msg))
-            )
+        )
     if traceback:
         import traceback
         try:
@@ -114,24 +114,24 @@ class DnsCherry(object):
                                                config, '86400')
             # configure the list of dns entry type to display
             self.type_displayed = re.split(
-                                      r'\W+',
-                                      self._get_param(
-                                          'dns',
-                                          'type.displayed',
-                                          config,
-                                          'CNAME, A, AAAA'
-                                          )
-                                  )
+                r'\W+',
+                self._get_param(
+                    'dns',
+                    'type.displayed',
+                    config,
+                    'CNAME, A, AAAA'
+                )
+            )
             # configure the list of dns entry type a user can write
             self.type_written = re.split(
-                                    r'\W+',
-                                    self._get_param(
-                                        'dns',
-                                        'type.written',
-                                        config,
-                                        'CNAME, A, AAAA'
-                                        )
-                                )
+                r'\W+',
+                self._get_param(
+                    'dns',
+                    'type.written',
+                    config,
+                    'CNAME, A, AAAA'
+                )
+            )
 
             # log configuration handling
             # get log level
@@ -141,7 +141,7 @@ class DnsCherry(object):
 
             # log format for syslog
             syslog_formatter = logging.Formatter(
-                    "dnscherry[%(process)d]: %(message)s")
+                "dnscherry[%(process)d]: %(message)s")
 
             access_handler = self._get_param('global', 'log.access_handler',
                                              config, 'syslog')
@@ -174,9 +174,9 @@ class DnsCherry(object):
                 cherrypy.log.error = syslog_error
 
                 handler = logging.handlers.SysLogHandler(
-                              address='/dev/log',
-                              facility='user'
-                              )
+                    address='/dev/log',
+                    facility='user'
+                )
                 handler.setFormatter(syslog_formatter)
                 cherrypy.log.error_log.addHandler(handler)
 
@@ -196,8 +196,8 @@ class DnsCherry(object):
 
             # preload templates
             self.temp_lookup = lookup.TemplateLookup(
-                    directories=self.template_dir, input_encoding='utf-8'
-                    )
+                directories=self.template_dir, input_encoding='utf-8'
+            )
             self.temp_index = self.temp_lookup.get_template('index.tmpl')
             self.temp_result = self.temp_lookup.get_template('result.tmpl')
             self.temp_error = self.temp_lookup.get_template('error.tmpl')
@@ -220,7 +220,7 @@ class DnsCherry(object):
                         'section': e.section
                     },
                 severity=logging.ERROR
-                )
+            )
             exit(1)
 
         # some static messages
@@ -335,8 +335,8 @@ class DnsCherry(object):
         """ validate that a domain string really looks like a domain string
         """
         if re.match(
-               r'^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$',
-               domain):
+            r'^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$',
+                domain):
             return True
         else:
             return False
@@ -384,12 +384,12 @@ class DnsCherry(object):
         })
 
         update = dns.update.Update(
-                     zone + '.',
-                     keyring=keyring,
-                     keyalgorithm=self._select_algorithm(
-                         self.zone_list[zone]['algorithm']
-                     )
-                 )
+            zone + '.',
+            keyring=keyring,
+            keyalgorithm=self._select_algorithm(
+                self.zone_list[zone]['algorithm']
+            )
+        )
 
         if action == 'add':
             ttl = int(ttl)
@@ -415,10 +415,10 @@ class DnsCherry(object):
 
         # log the traceback as 'debug'
         cherrypy.log.error(
-                msg='',
-                severity=logging.DEBUG,
-                traceback=True
-                )
+            msg='',
+            severity=logging.DEBUG,
+            traceback=True
+        )
 
         zone = str(zone)
 
@@ -432,17 +432,17 @@ class DnsCherry(object):
                 severity = logging.CRITICAL
 
             cherrypy.log.error(
-                    msg=message,
-                    severity=severity
-                    )
+                msg=message,
+                severity=severity
+            )
 
             return self.temp_error.render(
-                        logout_button=self.auth.logout_button,
-                        alert=alert,
-                        message=message,
-                        zone_list=self.zone_list,
-                        current_zone=zone
-                )
+                logout_button=self.auth.logout_button,
+                alert=alert,
+                message=message,
+                zone_list=self.zone_list,
+                current_zone=zone
+            )
 
         # first, we check if the zone name is valid
         if not self._validate_domain(zone):
@@ -573,14 +573,14 @@ class DnsCherry(object):
             return self._error_handler(e, zone)
 
         return self.temp_index.render(
-                logout_button=self.auth.logout_button,
-                records=records,
-                zone_list=self.zone_list,
-                default_ttl=self.default_ttl,
-                type_written=self.type_written,
-                current_zone=zone,
-                notifications=self._empty_notification(),
-                )
+            logout_button=self.auth.logout_button,
+            records=records,
+            zone_list=self.zone_list,
+            default_ttl=self.default_ttl,
+            type_written=self.type_written,
+            current_zone=zone,
+            notifications=self._empty_notification(),
+        )
 
     @cherrypy.expose
     def del_record(self, record=None, zone=None):
@@ -605,12 +605,12 @@ class DnsCherry(object):
             dns_class = (r.split(';'))[3]
             ttl = (r.split(';'))[4]
             del_record = {
-                   'key': key,
-                   'ttl': ttl,
-                   'class': dns_class,
-                   'type': type,
-                   'content': content
-                   }
+                'key': key,
+                'ttl': ttl,
+                'class': dns_class,
+                'type': type,
+                'content': content
+            }
             deleted_records.append(del_record)
             try:
                 self._manage_record(key=key, type=type,
@@ -620,14 +620,14 @@ class DnsCherry(object):
 
             message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
 %(content)s' removed by '%(user)s' on zone '%(zone)s'" % {
-                    'key': key,
-                    'ttl': ttl,
-                    'class': 'IN',
-                    'type': type,
-                    'content': content,
-                    'zone': zone,
-                    'user': user
-                    }
+                'key': key,
+                'ttl': ttl,
+                'class': 'IN',
+                'type': type,
+                'content': content,
+                'zone': zone,
+                'user': user
+            }
 
             self._add_notification(message)
             cherrypy.log.error(
@@ -656,28 +656,28 @@ class DnsCherry(object):
             return self._error_handler(e, zone)
 
         new_record = [{
-                'key': key,
-                'ttl': ttl,
-                'class': 'IN',
-                'type': type,
-                'content': content
-                }]
+            'key': key,
+            'ttl': ttl,
+            'class': 'IN',
+            'type': type,
+            'content': content
+        }]
 
         message = "Record '%(key)s %(ttl)s %(class)s %(type)s \
 %(content)s' added by '%(user)s' on zone '%(zone)s'" % {
-                    'key': key,
-                    'ttl': ttl,
-                    'class': 'IN',
-                    'type': type,
-                    'content': content,
-                    'zone': zone,
-                    'user': user
-                    }
+            'key': key,
+            'ttl': ttl,
+            'class': 'IN',
+            'type': type,
+            'content': content,
+            'zone': zone,
+            'user': user
+        }
 
         self._add_notification(message)
         cherrypy.log.error(
             msg=message,
             severity=logging.INFO
-         )
+        )
 
         raise cherrypy.HTTPRedirect("/?zone=" + zone)

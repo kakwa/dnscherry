@@ -28,4 +28,4 @@ class Auth(dnscherry.auth.Auth):
                 raise cherrypy.HTTPError(
                     "403 Forbidden",
                     "You are not allowed to access this resource."
-                    )
+                )

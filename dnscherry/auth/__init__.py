@@ -48,7 +48,7 @@ class Auth(object):
             self.logger.error(
                 msg=message,
                 severity=severity
-                )
+            )
 
     def end_session(self):
         """ remove the session from the session database
