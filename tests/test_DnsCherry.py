@@ -10,7 +10,6 @@ import subprocess
 from tempfile import NamedTemporaryFile as tempfile
 import re
 
-from sets import Set
 from dnscherry import DnsCherry
 
 import cherrypy

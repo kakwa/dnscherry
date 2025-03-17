@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 
 import pytest
 import sys
-from sets import Set
 from dnscherry.auth.modLdap import Auth, CaFileDontExist
 import cherrypy
 import logging
