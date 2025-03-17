@@ -18,6 +18,7 @@ small_description = 'A simple web application to manage DNS zones'
 install_requires = [
     'CherryPy >= 3.0.0',
     'dnspython',
+    'python-ldap',
     'Mako'
     ]
 
