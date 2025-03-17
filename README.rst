@@ -49,16 +49,4 @@ Dnscherry is released under the MIT public license.
 Installation
 ============
 
-Quick installation guide:
-
-.. sourcecode:: bash
-
-    $ pip install dnscherry
-    
-    # edit configuration according to your dns setup
-    $ vim /etc/dnscherry/dnscherry.ini
-
-    # launch dnscherryd
-    dnscherryd -c /etc/dnscherry/dnscherry.ini
-
-It should be accessible from your browser on http://localhost:8080.
+Debian and RPM packages are available here: `https://github.com/kakwa/kakwalab-pkg` (package name ``dnscherry``).
