@@ -4,9 +4,10 @@ DnsCherry
 .. image:: https://raw.githubusercontent.com/kakwa/dnscherry/master/resources/static/img/apple-touch-icon-72-precomposed.png
 
 
-.. image:: https://travis-ci.org/kakwa/dnscherry.svg?branch=master
-    :target: https://travis-ci.org/kakwa/dnscherry
-    
+.. image:: https://github.com/kakwa/dnscherry/actions/workflows/tests.yml/badge.svg
+    :target: https://github.com/kakwa/dnscherry/actions/workflows/tests.yml
+    :alt: CI
+
 .. image:: https://coveralls.io/repos/kakwa/dnscherry/badge.svg 
     :target: https://coveralls.io/r/kakwa/dnscherry
     

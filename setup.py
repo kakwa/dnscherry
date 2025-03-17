@@ -15,21 +15,11 @@ data_dir = os.path.join(sys.prefix, 'share', 'dnscherry')
 small_description = 'A simple web application to manage DNS zones'
 
 # change requirements according to python version
-if sys.version_info[0] == 2:
-    install_requires = [
-        'CherryPy >= 3.0.0',
-        'dnspython',
-        'Mako'
-        ],
-elif sys.version_info[0] == 3:
-    install_requires = [
-        'CherryPy >= 3.0.0',
-        'dnspython3',
-        'Mako'
-        ],
-else:
-    print('unsupported version')
-    exit(1)
+install_requires = [
+    'CherryPy >= 3.0.0',
+    'dnspython',
+    'Mako'
+    ]
 
 try:
     f = open(os.path.join(os.path.dirname(__file__), 'README.rst'))
@@ -124,9 +114,12 @@ setup(
             'Natural Language :: English',
             'Operating System :: POSIX',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3.2',
-            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+            'Programming Language :: Python :: 3.12',
+            'Programming Language :: Python :: 3.13',
             'Topic :: Internet :: Name Service (DNS)',
         ]
 )

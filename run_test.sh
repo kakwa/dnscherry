@@ -10,7 +10,7 @@ dnscherryd -d -p /tmp/dnscherry.pid -c /etc/dnscherry/dnscherry.ini
 #sleep a few seconds
 sleep 5
 
-python setup.py test
+python3 setup.py test
 ret=$?
 
 #stoping violently dnscherryd
