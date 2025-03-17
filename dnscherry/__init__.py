@@ -114,7 +114,7 @@ class DnsCherry(object):
                                                config, '86400')
             # configure the list of dns entry type to display
             self.type_displayed = re.split(
-                                      '\W+',
+                                      r'\W+',
                                       self._get_param(
                                           'dns',
                                           'type.displayed',
@@ -124,7 +124,7 @@ class DnsCherry(object):
                                   )
             # configure the list of dns entry type a user can write
             self.type_written = re.split(
-                                    '\W+',
+                                    r'\W+',
                                     self._get_param(
                                         'dns',
                                         'type.written',
@@ -205,7 +205,7 @@ class DnsCherry(object):
 
             # loading the authentification module
             auth_module = self._get_param('auth', 'auth.module', config)
-            auth = __import__(auth_module, globals(), locals(), ['Auth'], -1)
+            auth = __import__(auth_module, globals(), locals(), ['Auth'], 0)
             self.auth = auth.Auth(config['auth'], cherrypy.log)
 
             # initialize notitication
@@ -335,7 +335,7 @@ class DnsCherry(object):
         """ validate that a domain string really looks like a domain string
         """
         if re.match(
-               '^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$',
+               r'^(([a-zA-Z0-9\-]{1,63}\.?)+([a-zA-Z0-9\-]+)){1,255}$',
                domain):
             return True
         else:
