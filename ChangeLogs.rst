@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.1.4
+*************
+
+* adapt for Python 3
+* misc project chores (fix CI/tests, etc)
+
 Version 0.1.3
 *************
 
