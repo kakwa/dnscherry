@@ -300,6 +300,15 @@ class DnsCherry(object):
         else:
             return None
 
+    def _zone_where_port(self, zone):
+        """Return (host, port) for a zone from zone_list.
+        Host from zone's 'ip'. Port from zone's 'port' key, or 53 if not set.
+        """
+        info = self.zone_list[zone]
+        where = info['ip'].strip()
+        port = int(info['port']) if 'port' in info else 53
+        return where, port
+
     def _parse_zones(self, config):
         """dedicated parser for ['dns.zones'] section
         in .ini file.
@@ -307,7 +316,7 @@ class DnsCherry(object):
 
         # each entry in dns.zones is a zone parameters
         # format <key>.<zone> = '<value>'
-        # list of the keys: ip, algorithm, key
+        # list of the keys: ip, port, algorithm, key
         for entry in config['dns.zones']:
 
             # split at the first dot
@@ -354,8 +363,8 @@ class DnsCherry(object):
         if zone is None:
             zone = self.zone_default
         # get the zone from the dns
-        self.zone = dns.zone.from_xfr(dns.query.xfr(
-            self.zone_list[zone]['ip'], zone))
+        where, port = self._zone_where_port(zone)
+        self.zone = dns.zone.from_xfr(dns.query.xfr(where, zone, port=port))
         records = []
         # get all the records in a list of hash
         # {'key', 'class', 'type', 'ttl', 'content'}
@@ -402,7 +411,8 @@ class DnsCherry(object):
         else:
             raise WrongDnsUpdateMethod
 
-        response = dns.query.tcp(update, self.zone_list[zone]['ip'])
+        where, port = self._zone_where_port(zone)
+        response = dns.query.tcp(update, where, port=port)
 
     def _reraise(self, exception):
         """ reraise a given exception"""

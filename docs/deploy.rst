@@ -99,6 +99,8 @@ Configure the zone in DnsCherry:
     #####################################
     # dns server ip
     ip.example.com = '127.0.0.1'
+    # dns server port (optional, default 53)
+    port.example.com = 53
     # hmac algorithm
     algorithm.example.com = 'hmac-sha512'
     # hmac key
@@ -107,7 +109,8 @@ Configure the zone in DnsCherry:
 You can configure multiple zones by adding the following parameters in the **[dns.zones]** section:
 
 * **ip.<your domain>**
-* **algorithm.<your domain>** 
+* **port.<your domain>** (optional, default 53)
+* **algorithm.<your domain>**
 * **key.<your domain>**
 
 example:
@@ -117,10 +120,12 @@ example:
     [dns.zones]
 
     ip.example.com = '127.0.0.1'
+    port.example.com = 53
     algorithm.example.com = 'hmac-sha512'
     key.example.com = 'oWko9cZosUzScZ5VStLA=='
 
     ip.mydomain.org = '192.168.0.1'
+    port.mydomain.org = 5353
     algorithm.mydomain.org = 'hmac-md5'
     key.mydomain.org = 'oWko9caaaafdeZosUzScZ5VStLA=='
 
