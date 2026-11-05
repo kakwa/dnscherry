@@ -22,12 +22,13 @@ zone "example.com" {
 	type master;
 	file "/etc/bind/db.example.com";
     allow-update { key "example.com."; };
-    //allow-transfer { key "DnsCherry"; };
+    allow-transfer { 127.0.0.1; };
 };
 
 zone "example2.com" {
 	type master;
 	file "/etc/bind/db.example2.com";
+    allow-transfer { 127.0.0.1; };
 };
 
 zone "127.in-addr.arpa" {
