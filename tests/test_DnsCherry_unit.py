@@ -929,3 +929,126 @@ class TestReloadMissingParam:
         assert 'resources' in call_kwargs['msg']
         # exit(1) called
         assert mock_exit.call_args[0][0] == 1
+
+
+# ---------------------------------------------------------------------------
+# _manage_record
+# ---------------------------------------------------------------------------
+
+class TestManageRecord:
+
+    @staticmethod
+    def _app_with_zone(zone_info):
+        app = make_app()
+        app.zone_list['example.com'] = dict(zone_info)
+        return app
+
+    def test_del_record(self, monkeypatch):
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'key': 'secret', 'algorithm': 'hmac-md5'
+        })
+        mock_from_text = MagicMock(return_value='MOCK_KEYRING')
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', mock_from_text)
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        app._manage_record(
+            key='foo', zone='example.com', type='A', action='del'
+        )
+
+        # keyring built from the zone key
+        mock_from_text.assert_called_once_with(
+            {'example.com': 'secret'}
+        )
+        # TSIG update with the zone name and the selected algorithm
+        mock_update_cls.assert_called_once_with(
+            'example.com.',
+            keyring='MOCK_KEYRING',
+            keyalgorithm=dns.tsig.HMAC_MD5
+        )
+        mock_update = mock_update_cls.return_value
+        mock_update.delete.assert_called_once_with('foo', 'A')
+        mock_update.add.assert_not_called()
+        # the update message is sent to the zone server
+        mock_tcp.assert_called_once_with(
+            mock_update, '127.0.0.1', port=53
+        )
+
+    def test_del_record_with_port(self, monkeypatch):
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'port': '5353',
+            'key': 'secret', 'algorithm': 'hmac-sha512'
+        })
+        mock_from_text = MagicMock()
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', mock_from_text)
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        app._manage_record(
+            key='bar', zone='example.com', type='AAAA', action='del'
+        )
+
+        mock_update_cls.assert_called_once_with(
+            'example.com.',
+            keyring=mock_from_text.return_value,
+            keyalgorithm=dns.tsig.HMAC_SHA512
+        )
+        mock_update = mock_update_cls.return_value
+        mock_update.delete.assert_called_once_with('bar', 'AAAA')
+        mock_tcp.assert_called_once_with(
+            mock_update, '127.0.0.1', port=5353
+        )
+
+    def test_add_record(self, monkeypatch):
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'key': 'secret', 'algorithm': 'hmac-md5'
+        })
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', MagicMock())
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        # ttl given as str, type given as int: both are coerced
+        app._manage_record(
+            key='www', ttl='3600', type=1, zone='example.com',
+            content='1.2.3.4', action='add'
+        )
+
+        mock_update = mock_update_cls.return_value
+        mock_update.add.assert_called_once_with(
+            'www', 3600, '1', '1.2.3.4'
+        )
+        mock_update.delete.assert_not_called()
+        mock_tcp.assert_called_once_with(
+            mock_update, '127.0.0.1', port=53
+        )
+
+    def test_unknown_action_raises(self, monkeypatch):
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'key': 'secret', 'algorithm': 'hmac-md5'
+        })
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', MagicMock())
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        with pytest.raises(WrongDnsUpdateMethod):
+            app._manage_record(
+                key='foo', zone='example.com', type='A', action='update'
+            )
+
+        # nothing was applied or sent
+        mock_update = mock_update_cls.return_value
+        mock_update.add.assert_not_called()
+        mock_update.delete.assert_not_called()
+        mock_tcp.assert_not_called()

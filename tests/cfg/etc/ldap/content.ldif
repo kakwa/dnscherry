@@ -42,6 +42,14 @@ carlicense: HERCAR 125
 homephone: 555-111-2225
 mail: j.watson@example.com
 
+dn: cn=No Group,ou=people,dc=example,dc=org
+objectclass: inetOrgPerson
+cn: No Group
+sn: Group
+uid: ngroup
+userpassword: passwordngroup
+mail: n.group@example.com
+
 dn: cn=itpeople,ou=groups,dc=example,dc=org
 objectclass: groupofnames
 cn: itpeople

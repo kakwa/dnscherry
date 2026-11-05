@@ -8,6 +8,7 @@ import cherrypy
 import ldap
 import dnscherry.auth
 import logging
+import os
 
 SESSION_KEY = '_cp_username'
 
@@ -88,7 +89,7 @@ class Auth(dnscherry.auth.Auth):
         if self.starttls == 'on':
             try:
                 ldap_client.start_tls_s()
-            except ldap.OPERATIONS_ERROR:
+            except (ldap.OPERATIONS_ERROR, ldap.LOCAL_ERROR):
                 self._logger(
                     logging.ERROR,
                     "cannot use starttls with ldaps:// uri (uri: " +
