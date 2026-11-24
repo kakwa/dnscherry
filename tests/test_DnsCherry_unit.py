@@ -1052,3 +1052,52 @@ class TestManageRecord:
         mock_update.add.assert_not_called()
         mock_update.delete.assert_not_called()
         mock_tcp.assert_not_called()
+
+    def test_tsig_key_name_from_zone_config(self, monkeypatch):
+        """the keyring is named 'name.<zone>' if configured (named's
+        allow-update matches the TSIG key name in the signature, which
+        is usually not the zone name)."""
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'key': 'secret', 'algorithm': 'hmac-sha512',
+            'name': 'sec1_key',
+        })
+        mock_from_text = MagicMock(return_value='MOCK_KEYRING')
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', mock_from_text)
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        app._manage_record(
+            key='foo', ttl='3600', type='A', zone='example.com',
+            content='1.2.3.4', action='add'
+        )
+
+        mock_from_text.assert_called_once_with({'sec1_key': 'secret'})
+        mock_update_cls.assert_called_once_with(
+            'example.com.',
+            keyring='MOCK_KEYRING',
+            keyalgorithm=dns.tsig.HMAC_SHA512
+        )
+
+    def test_tsig_key_name_defaults_to_zone(self, monkeypatch):
+        """without a 'name' entry the zone name is used as the key name
+        (legacy behaviour, kept for backwards compatibility)."""
+        import dns.update, dns.query
+        app = self._app_with_zone({
+            'ip': '127.0.0.1', 'key': 'secret', 'algorithm': 'hmac-md5'
+        })
+        mock_from_text = MagicMock(return_value='MOCK_KEYRING')
+        mock_update_cls = MagicMock()
+        mock_tcp = MagicMock()
+        monkeypatch.setattr(dns.tsigkeyring, 'from_text', mock_from_text)
+        monkeypatch.setattr(dns.update, 'Update', mock_update_cls)
+        monkeypatch.setattr(dns.query, 'tcp', mock_tcp)
+
+        app._manage_record(
+            key='foo', ttl='3600', type='A', zone='example.com',
+            content='1.2.3.4', action='add'
+        )
+
+        mock_from_text.assert_called_once_with({'example.com': 'secret'})

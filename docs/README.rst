@@ -1,14 +1,11 @@
----------------------------------------
-Build the DnsCherry docs/website:
----------------------------------------
+Building the documentation
+===========================
 
-The dnscherry documentation/website is built using `Sphinx`_.
+The manual is built with `Sphinx <https://www.sphinx-doc.org/>`_.
 
-.. _Sphinx: http://sphinx.pocoo.org/
+From the ``docs`` directory::
 
-To build the docs you need to perform the following tasks:
+    pip install sphinx
+    make html
 
-* Install Sphinx (``$ sudo apt-get install python-sphinx``)
-* From this ``docs`` directory, run: ``$ make html``
-* This will produce HTML documentation in the ``_build/html/`` directory
-* Open ``_build/html/index.html`` with your browser
+Output is written to ``_build/html/``; open ``_build/html/index.html`` in a browser.

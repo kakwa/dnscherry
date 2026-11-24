@@ -1,4 +1,4 @@
-Auth Modules
+Auth modules
 ============
 
 Configuration
@@ -7,95 +7,63 @@ Configuration
 modNone
 ~~~~~~~
 
-This module is used if no authentication is needed, for example, with a Single Sign On in front of DnsCherry.
-
-However, in order to trace who made which action, the user name can be provided in an http header, 
-in that case, having the http header in each request is mandatory.
-
-Configuration:
+No interactive login—useful with SSO in front of DnsCherry. To attribute actions to a user, an HTTP header may supply the username (then every request must carry it).
 
 .. sourcecode:: ini
 
     [auth]
-    
-    # auth module to load
+
     auth.module = 'dnscherry.auth.modNone'
-    # optional http header handling.
-    #auth.none.user_header_name = 'AUTH_USER'
+    # optional:
+    # auth.none.user_header_name = 'AUTH_USER'
 
 modHtpasswd
 ~~~~~~~~~~~
 
-This module uses an htpasswd file as a users database.
+File-based users (`htpasswd` format).
 
 .. warning::
 
-    This module requires installing **python-passlib**.
-
-Configuration:
+    Requires **passlib** (``pip install 'dnscherry[auth_htpasswd]'`` or ``pip install passlib``).
 
 .. sourcecode:: ini
 
     [auth]
- 
-    # name of the auth module
-    auth.module = 'dnscherry.auth.modHtpasswd'
-    # path to htpasswd file
-    auth.htpasswd.file = '/etc/dnscherry/users.db'
 
+    auth.module = 'dnscherry.auth.modHtpasswd'
+    auth.htpasswd.file = '/etc/dnscherry/users.db'
 
 modLdap
 ~~~~~~~
 
-This module authenticates users against an ldap server.
+LDAP bind + search authentication.
 
 .. warning::
 
-    This module requires installing **python-ldap**.
-
-.. warning::
-
-    As **python-ldap** is **not compatible with python 3.x**, DnsCherry must be launched with **python 2.7** if this module is used.
-
-Configuration:
+    Requires **python-ldap** (included in default installs; extras: ``pip install 'dnscherry[auth_ldap]'``).
 
 .. sourcecode:: ini
 
     [auth]
- 
-    # name of the auth module
+
     auth.module = 'dnscherry.auth.modLdap'
-    # base dn where to search user
     auth.ldap.userdn = 'ou=People,dc=example,dc=org'
-    # ldap login filter
     auth.ldap.user.filter.tmpl = '(uid=%(login)s)'
-    # base dn for group (optional) 
-    # (if empty, all user in userdn can access dnscherry)
+    # optional group restriction (if unset, any user under userdn may log in)
     auth.ldap.groupdn = 'cn=itpeople,ou=Groups,dc=example,dc=org'
-    # ldap group filter (optional, except if auth.ldap.groupdn is defined) 
     auth.ldap.group.filter.tmpl = '(member=%(userdn)s)'
-    # bind dn
-    auth.ldap.binddn = 'cn=dnscherry,dc=example,dc=org' 
-    # bind password
+    auth.ldap.binddn = 'cn=dnscherry,dc=example,dc=org'
     auth.ldap.bindpassword = 'password'
-    # ldap uri
     auth.ldap.uri = 'ldap://ldap.dnscherry.org'
-    # ldap CA file (optional, used for ssl/tls)
     auth.ldap.ca = '/etc/dnscherry/TEST-cacert.pem'
-    # enable starttls (optional, default off, don't use it with ldaps)
     auth.ldap.starttls = 'on'
-    # check certificat (optional, default on)
     auth.ldap.checkcert = 'on'
-    # ldap timeout in seconds (default 1 second)
     auth.ldap.timeout = 2
 
-Implementing your own auth modules
-----------------------------------
+Custom modules
+--------------
 
-Implementing your own modules should be fairly easy, 
-just create a python module with a class inheriting from dnscherry.auth.Auth, 
-and implement the **__init__** and **check_credentials** methods:
-
+Subclass ``dnscherry.auth.Auth`` and implement ``__init__`` and ``check_credentials``:
 
 .. sourcecode:: python
 
@@ -104,41 +72,13 @@ and implement the **__init__** and **check_credentials** methods:
     import logging
 
     class Auth(dnscherry.auth.Auth):
-    
+
         def __init__(self, config, logger=None):
-            """ module initialization
-            initialize the auth module
-            the 'auth' section of the ini file is passed by 'config'
-            @hash config: the 'auth' section of the ini file
-            @logger logger: the dnscherry error logger
-            """
             self.logger = logger
-            
-            # set to True if you want the logout button to be displayed
-            # set to False to hide it
             self.logout_button = False
-
-            # get param1, with default value 'hello'
             self.param1 = self._get_param('auth.mymod.param1', 'hello')
-
-            # get param2, with no default value 
-            # if not provided in the 'auth' section, DnsCherry will emit 
-            # a log telling that the parameter is missing and exit(1)
             self.param2 = self._get_param('auth.mymod.param2')
-            
-            # emit a custom log 
-            self._logger(
-                 logging.DEBUG,
-                 'my module is initialized'
-            )
+            self._logger(logging.DEBUG, 'my module is initialized')
 
         def check_credentials(self, username, password):
-            """ Check credential function (called on login)
-            @str username: the login to check
-            @str password: the password to check
-            @rtype: bool (True if authentificated, False otherwise)
-            """
-            
-            # simple module checking only one user/password
             return username == 'george' and password == 'password'
-

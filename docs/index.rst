@@ -1,44 +1,43 @@
 ==============
-  DnsCherry 
+  DnsCherry
 ==============
 
-Dns management web interface.
+Web UI for DNS zone management.
 
 ----
 
-:Dev: `dnscherry git <https://github.com/kakwa/dnscherry>`_
-:PyPI: `dnscherry package <http://pypi.python.org/pypi/dnscherry>`_
-:License: MIT
-:Author: Pierre-Francois Carpentier - copyright © 2014
+| **Source:** https://github.com/kakwa/dnscherry
+| **PyPI:** https://pypi.python.org/pypi/dnscherry
+| **License:** MIT
+| **Author:** Pierre-Francois Carpentier (© 2014)
 
 ----
 
 *************
-  Site Menu
+  Contents
 *************
 
 .. toctree::
     :maxdepth: 1
-    
+
     install
     deploy
     auth_module
     changelog
 
 ****************
-  Presentation
+  Overview
 ****************
 
-DnsCherry is cherrypy application to manage dns zones.
+DnsCherry is a CherryPy application for editing DNS zones.
 
-It's main functionalities are:
+Features:
 
-* add or delete records in one or several zones (using Tsig HMAC)
-* access control with htpasswd files, ldap, http header (use it behind a SSO)
-* modular auth mechanisms, custom authentication modules can easily be implemented
-* traces for each action (add/delete record, connexions...) through logs (syslog or files)
+* Add or delete records in one or more zones (TSIG / dynamic update)
+* Authentication via htpasswd, LDAP, HTTP headers (e.g. behind SSO), or custom modules
+* Optional audit trail via access and application logs (file or syslog)
 
-DnsCherry aims to be a simple to deploy and to use Dns web interface.
+DnsCherry is intended to be simple to deploy and operate.
 
 **************
   Screenshot
@@ -48,11 +47,10 @@ DnsCherry aims to be a simple to deploy and to use Dns web interface.
     :width: 600 px
 
 *******************************
-  Discussion / Help / Updates
+  Help and feedback
 *******************************
 
-* IRC: `Freenode <http://freenode.net/>`_ ``#dnscherry`` channel
-* Bugtracker: `Github <https://github.com/kakwa/dnscherry/issues>`_
+* **Issues:** https://github.com/kakwa/dnscherry/issues
 
 ----
 

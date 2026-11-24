@@ -4,37 +4,14 @@ Deploy
 Launching DnsCherry
 -------------------
 
-DnsCherry can be launched using cherrypy internal webserver:
+Run the bundled CherryPy server (see ``dnscherryd -h`` for FastCGI, SCGI, CGI, daemon mode, and other options)::
 
+    dnscherryd -c /etc/dnscherry/dnscherry.ini
 
-.. sourcecode:: bash
+DNS configuration
+-------------------
 
-    # dnscherryd help
-    $ dnscherryd -h
-    Usage: dnscherryd [options]
-    
-    Options:
-      -h, --help            show this help message and exit
-      -c CONFIG, --config=CONFIG
-                            specify config file
-      -d                    run the server as a daemon
-      -e ENVIRONMENT, --environment=ENVIRONMENT
-                            apply the given config environment
-      -f                    start a fastcgi server instead of the default HTTP
-                            server
-      -s                    start a scgi server instead of the default HTTP server
-      -x                    start a cgi server instead of the default HTTP server
-      -p PIDFILE, --pidfile=PIDFILE
-                            store the process id in the given file
-      -P PATH, --Path=PATH  add the given paths to sys.path
-
-    # launching dnscherryd
-    $ dnscherryd -c /etc/dnscherry/dnscherry.ini
-
-Dns Configuration
------------------
-
-This section presents the configuration of a zone **example.com**, change it with your own zone name.
+Examples below use zone **example.com**; substitute your zone name.
 
 Creation of the tsig key
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,7 +35,7 @@ To create a tsig key, use the following commands:
    Publish: 20140521080238
    Activate: 20140521080238
 
-The important field for us is **Key**, it's this field which will be used in the dns server and DnsCherry.
+Use the **Key** value in both BIND and DnsCherry.
 
 Bind server TSIG configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,33 +139,28 @@ DnsCherry has other dns parameters which must be provided:
 Logs
 ----
 
-DnsCherry has two loggers, one for errors and actions (login, del/add, logout...) and one for access logs.
-Each logger can be configured to log to syslog, file or be disabled. 
+Two log channels: application (errors and actions such as login and record changes) and HTTP access. Each can write to syslog, a file, or be disabled.
 
 .. warning::
 
-    you can't set a logger to log both in file and syslog
+    A single logger cannot use both file and syslog at once.
 
-Syslog configuration:
+Syslog:
 
 .. sourcecode:: ini
 
     [global]
 
-    # logger syslog for access log 
     log.access_handler = 'syslog'
-    # logger syslog for error and dnscherry log 
     log.error_handler = 'syslog'
 
-File configuration:
+File:
 
 .. sourcecode:: ini
 
     [global]
 
-    # logger syslog for access log 
     log.access_handler = 'file'
-    # logger syslog for error and dnscherry log 
     log.error_handler = 'file'
     # access log file
     log.access_file = '/tmp/dnscherry_access.log'
@@ -201,9 +173,7 @@ Disable logs:
 
     [global]
 
-    # logger syslog for access log 
     log.access_handler = 'none'
-    # logger syslog for error and dnscherry log 
     log.error_handler = 'none'
 
 Set log level:
@@ -222,7 +192,7 @@ Other DnsCherry parameters
 
     [global]
     
-    # listing interface
+    # bind address
     server.socket_host = '127.0.0.1'
     # port
     server.socket_port = 8080
@@ -253,32 +223,23 @@ Other DnsCherry parameters
     tools.staticdir.on = True
     tools.staticdir.dir = '/usr/share/dnscherry/static/'
 
-WebServer
----------
+Reverse proxy
+-------------
 
-Idealy, DnsCherry must be deployed behind a proper http server like nginx or apache.
+For production, run DnsCherry behind nginx or Apache (TLS, HTTP/2, hardening). Terminate TLS at the proxy and forward to DnsCherry on localhost.
 
-The webserver must be configured to act as a reverse (ssl) proxy to a DnsCherry instance listening on localhost (127.0.0.1).
+CherryPy built-in server
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Cherrypy
-~~~~~~~~
+Fine for testing. Limitations: no TLS in CherryPy itself, non-privileged ports unless configured otherwise.
 
-Cherrypy has an embeded web sever which can be used for testing.
-
-It has some severe limitations:
-
-* no SSL/TLS
-* no listening on the standard http port 80
-
-To make DnsCherry listens on every IP:
+Listen on all interfaces:
 
 .. sourcecode:: ini
 
     [global]
-    
-    # listing interface
+
     server.socket_host = '0.0.0.0'
-    # port
     server.socket_port = 8080
  
 Nginx

@@ -316,7 +316,8 @@ class DnsCherry(object):
 
         # each entry in dns.zones is a zone parameters
         # format <key>.<zone> = '<value>'
-        # list of the keys: ip, port, algorithm, key
+        # list of the keys: ip, port, algorithm, key, name
+        # ('name' is the TSIG key name, used in RFC 2136 updates)
         for entry in config['dns.zones']:
 
             # split at the first dot
@@ -387,9 +388,13 @@ class DnsCherry(object):
                        zone=None, content=None, action=None):
         """ add or delete a given record
         """
-
+        # TSIG key name: 'name.<zone>' if configured, else the zone name.
+        # named's allow-update matches the key name carried in the TSIG
+        # signature, so the key name must match the key defined in named.conf
+        # (e.g. "sec1_key"), which is usually not the zone name.
+        tsig_key_name = self.zone_list[zone].get('name', zone)
         keyring = dns.tsigkeyring.from_text({
-            zone: self.zone_list[zone]['key']
+            tsig_key_name: self.zone_list[zone]['key']
         })
 
         update = dns.update.Update(
